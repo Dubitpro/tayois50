@@ -5,8 +5,8 @@ import { ChevronDown, Sparkles, Clock, PenTool, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const calculateTimeLeft = () => {
-  // Let's set a date in the future for the Jubilee
-  const difference = +new Date("2026-10-15T00:00:00") - +new Date();
+  // Let's set a date in the future for the Jubilee (August 9th)
+  const difference = +new Date("2026-08-09T00:00:00") - +new Date();
   let timeLeft = {
     days: 0,
     hours: 0,
@@ -102,7 +102,7 @@ export default function Home() {
       
 
       {/* Hero Section */}
-      <section className="relative min-h-[100svh] lg:min-h-[120vh] flex items-center justify-center overflow-hidden -mt-24 pt-24">
+      <section className="relative h-[80svh] md:h-auto md:min-h-[100svh] lg:min-h-[120vh] flex items-center justify-center overflow-hidden -mt-24 pt-24">
         {/* Background Image / Gradient */}
         <div className="absolute inset-0 z-0 bg-elegant-black">
           {/* Dark Overlay */}
@@ -113,7 +113,7 @@ export default function Home() {
             <img 
               src="https://i.pinimg.com/736x/4b/62/ca/4b62caa88760bc422fa59197ed1fb1d8.jpg" 
               alt="Royal Portrait Mobile" 
-              className="absolute inset-0 w-full h-full object-cover object-center"
+              className="absolute inset-0 w-full h-full object-cover object-[center_top]"
               referrerPolicy="no-referrer"
             />
           </div>
@@ -143,7 +143,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="container relative z-20 mx-auto px-6 text-left text-pearl-white mb-48 md:mb-0">
+        <div className="container relative z-20 mx-auto px-6 text-left text-pearl-white -translate-y-8 md:translate-y-0">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

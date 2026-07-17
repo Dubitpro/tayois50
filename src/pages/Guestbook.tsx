@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { collection, addDoc, query, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase/config';
 import { PenTool, Loader2 } from 'lucide-react';
 
 const guestbookSchema = z.object({
@@ -21,7 +19,7 @@ interface GuestbookEntry {
   name: string;
   country: string;
   message: string;
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
 export default function Guestbook() {
@@ -40,34 +38,13 @@ export default function Guestbook() {
 
   const fetchEntries = async () => {
     try {
-      // NOTE: For a real app, you'd use onSnapshot for real-time updates.
-      // We use getDocs here for simplicity and to limit initial reads.
-      const q = query(collection(db, 'guestbook'), orderBy('createdAt', 'desc'), limit(10));
-      const querySnapshot = await getDocs(q);
-      const fetchedEntries: GuestbookEntry[] = [];
-      querySnapshot.forEach((doc) => {
-        fetchedEntries.push({ id: doc.id, ...doc.data() } as GuestbookEntry);
-      });
-      setEntries(fetchedEntries);
+      const response = await fetch('/api/wishes');
+      if (response.ok) {
+        const data = await response.json();
+        setEntries(data);
+      }
     } catch (error) {
       console.error("Error fetching guestbook entries:", error);
-      // Fallback data for demonstration if Firebase is not configured
-      setEntries([
-        {
-          id: '1',
-          name: 'Isabella Mountbatten',
-          country: 'United Kingdom',
-          message: 'Wishing Her Majesty the most joyous of Golden Jubilees. Your grace and dedication inspire us all.',
-          createdAt: Timestamp.now()
-        },
-        {
-          id: '2',
-          name: 'Francois Cartier',
-          country: 'France',
-          message: 'A true beacon of elegance and leadership. Happy 50th Birthday to our beloved Queen!',
-          createdAt: Timestamp.now()
-        }
-      ]);
     }
   };
 
@@ -76,16 +53,20 @@ export default function Guestbook() {
     setSubmitError(null);
     setSubmitSuccess(false);
     try {
-      await addDoc(collection(db, 'guestbook'), {
-        ...data,
-        createdAt: Timestamp.now()
+      const response = await fetch('/api/wishes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       });
+      
+      if (!response.ok) throw new Error("Failed to post");
+      
       setSubmitSuccess(true);
       reset();
       fetchEntries();
     } catch (error) {
       console.error("Error adding document: ", error);
-      setSubmitError("Failed to sign the guestbook. Please check your connection or Firebase configuration.");
+      setSubmitError("Failed to sign the guestbook. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

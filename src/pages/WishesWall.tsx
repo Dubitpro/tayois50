@@ -1,18 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 import { Quote } from 'lucide-react';
 
-const wishes = [
-  { name: "King Charles", country: "United Kingdom", text: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee." },
-  { name: "Amelia Windsor", country: "Monaco", text: "Fifty years of grace, resilience, and unyielding elegance. The world celebrates you today." },
-  { name: "Sheikh Mohammed", country: "UAE", text: "Your visionary leadership has bridged continents. Wishing you a joyous and blessed Jubilee." },
-  { name: "Victoria Beckham", country: "United Kingdom", text: "An icon of timeless style and strength. Happy Birthday to our glorious Queen." },
-  { name: "Prime Minister", country: "Canada", text: "We honor your decades of service and dedication to global peace." },
-  { name: "Elena Romanova", country: "Italy", text: "May your golden years be as radiant as the legacy you've built." }
-];
+interface Wish {
+  id: string;
+  name: string;
+  country: string;
+  message: string;
+}
 
 export default function WishesWall() {
+  const [wishes, setWishes] = useState<Wish[]>([]);
+
+  useEffect(() => {
+    const fetchWishes = async () => {
+      try {
+        const response = await fetch('/api/wishes');
+        if (response.ok) {
+          const data = await response.json();
+          setWishes(data);
+        }
+      } catch (error) {
+        console.error("Error fetching wishes", error);
+      }
+    };
+    fetchWishes();
+  }, []);
+
   return (
     <>
       <SEO title="Wishes Wall" description="Heartfelt messages from dignitaries, royal families, and admirers across the globe." />
@@ -42,7 +57,7 @@ export default function WishesWall() {
               >
                 <Quote className="w-8 h-8 text-luxury-gold/30 absolute top-8 left-8" />
                 <p className="font-serif text-lg leading-relaxed text-elegant-black/80 mt-6 mb-8 relative z-10 italic">
-                  "{wish.text}"
+                  "{wish.message}"
                 </p>
                 <div className="flex items-center gap-4 mt-auto">
                   <div className="w-10 h-10 rounded-full bg-soft-ivory border border-luxury-gold flex items-center justify-center text-luxury-gold font-cormorant text-xl">

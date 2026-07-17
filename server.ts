@@ -2,12 +2,55 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import fs from "fs/promises";
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
+
+  const WISHES_FILE = path.join(process.cwd(), 'wishes.json');
+
+  // Initialize wishes file if it doesn't exist
+  try {
+    await fs.access(WISHES_FILE);
+  } catch {
+    await fs.writeFile(WISHES_FILE, JSON.stringify([
+      { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", createdAt: new Date().toISOString() },
+      { id: '2', name: "Amelia Windsor", country: "Monaco", message: "Fifty years of grace, resilience, and unyielding elegance. The world celebrates you today.", createdAt: new Date().toISOString() },
+      { id: '3', name: "Sheikh Mohammed", country: "UAE", message: "Your visionary leadership has bridged continents. Wishing you a joyous and blessed Jubilee.", createdAt: new Date().toISOString() },
+      { id: '4', name: "Victoria Beckham", country: "United Kingdom", message: "An icon of timeless style and strength. Happy Birthday to our glorious Queen.", createdAt: new Date().toISOString() },
+      { id: '5', name: "Prime Minister", country: "Canada", message: "We honor your decades of service and dedication to global peace.", createdAt: new Date().toISOString() },
+      { id: '6', name: "Elena Romanova", country: "Italy", message: "May your golden years be as radiant as the legacy you've built.", createdAt: new Date().toISOString() }
+    ], null, 2));
+  }
+
+  app.get("/api/wishes", async (req, res) => {
+    try {
+      const data = await fs.readFile(WISHES_FILE, "utf-8");
+      res.json(JSON.parse(data));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch wishes." });
+    }
+  });
+
+  app.post("/api/wishes", async (req, res) => {
+    try {
+      const { name, country, message } = req.body;
+      if (!name || !country || !message) return res.status(400).json({ error: "Missing fields" });
+      
+      const data = await fs.readFile(WISHES_FILE, "utf-8");
+      const wishes = JSON.parse(data);
+      const newWish = { id: Date.now().toString(), name, country, message, createdAt: new Date().toISOString() };
+      wishes.unshift(newWish);
+      await fs.writeFile(WISHES_FILE, JSON.stringify(wishes, null, 2));
+      
+      res.json(newWish);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save wish." });
+    }
+  });
 
   // API Route: Generate AI Royal Tribute
   app.post("/api/generate-tribute", async (req, res) => {

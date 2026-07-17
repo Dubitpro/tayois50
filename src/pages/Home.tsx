@@ -143,7 +143,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="container relative z-20 mx-auto px-6 text-left text-pearl-white">
+        <div className="container relative z-20 mx-auto px-6 text-left text-pearl-white mb-48 md:mb-0">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -151,7 +151,7 @@ export default function Home() {
             transition={{ duration: 1, delay: 0.3 }}
             className="font-sans text-sm md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4"
           >
-            Celebrating 50 Glorious Years
+            Celebrating 50 <br className="md:hidden" /> Glorious Years
           </motion.h2>
           
           <motion.h1 
@@ -164,7 +164,7 @@ export default function Home() {
             Golden Jubilee
           </motion.h1>
           
-          <div className="h-20 mb-4 max-w-2xl">
+          <div className="h-12 md:h-20 mb-2 md:mb-4 max-w-2xl">
             <AnimatePresence mode="wait">
               <motion.p 
                 key={currentImageIndex}
@@ -172,7 +172,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.8 }}
-                className="font-serif text-xl md:text-2xl font-light italic text-pearl-white/90"
+                className="font-serif text-base md:text-2xl font-light italic text-pearl-white/90"
               >
                 {heroCaptions[currentImageIndex]}
               </motion.p>
@@ -184,21 +184,21 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 1, delay: 1.2 }}
-            className="flex flex-col items-start gap-5"
+            className="flex flex-col items-start gap-2 md:gap-5"
           >
             {/* Countdown */}
-            <div className="flex gap-3 md:gap-6 justify-start border-y border-luxury-gold/30 py-3 w-full max-w-xl backdrop-blur-sm bg-elegant-black/20">
+            <div className="flex gap-2 md:gap-6 justify-start border-y border-luxury-gold/30 py-2 md:py-3 w-full max-w-xl backdrop-blur-sm bg-elegant-black/20">
               {Object.entries(timeLeft).map(([unit, value], idx) => (
-                <div key={unit} className="flex flex-col items-center px-3 md:px-4">
-                  <span className="font-cormorant text-3xl md:text-4xl text-luxury-gold">{value.toString().padStart(2, '0')}</span>
-                  <span className="font-sans text-[9px] md:text-[10px] uppercase tracking-widest text-pearl-white/70 mt-1">{unit}</span>
+                <div key={unit} className="flex flex-col items-center px-2 md:px-4">
+                  <span className="font-cormorant text-xl md:text-4xl text-luxury-gold">{value.toString().padStart(2, '0')}</span>
+                  <span className="font-sans text-[8px] md:text-[10px] uppercase tracking-widest text-pearl-white/70 mt-1">{unit}</span>
                 </div>
               ))}
             </div>
 
             <Link 
               to="/guestbook" 
-              className="inline-block border border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-elegant-black transition-all duration-500 px-6 py-3 uppercase tracking-[0.2em] text-xs font-medium"
+              className="inline-block border border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-elegant-black transition-all duration-500 px-4 py-2 md:px-6 md:py-3 uppercase tracking-[0.2em] text-[10px] md:text-xs font-medium"
             >
               Sign the Guestbook
             </Link>

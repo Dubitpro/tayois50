@@ -29,6 +29,54 @@ async function startServer() {
     ], null, 2));
   }
 
+  const CONFIG_FILE = path.join(process.cwd(), 'config.json');
+
+  // Initialize config file if it doesn't exist
+  try {
+    await fs.access(CONFIG_FILE);
+  } catch {
+    await fs.writeFile(CONFIG_FILE, JSON.stringify({
+      countdownDate: "2026-08-09T00:00:00",
+      heroTitleTop: "Celebrating 50 \n Glorious Years",
+      heroTitleMain: "Golden Jubilee",
+      heroCaptions: [
+        "A legacy of elegance and strength.",
+        "Grace that transcends time.",
+        "Radiance in every moment."
+      ],
+      galleryImages: [
+        "https://i.pinimg.com/736x/5b/fe/d7/5bfed7298601ac9c981fd5cb03a46fa5.jpg",
+        "https://i.pinimg.com/736x/f6/3a/a3/f63aa3c3206dfd2baf03eb4782110437.jpg",
+        "https://i.pinimg.com/736x/34/d0/fb/34d0fb4b34acbdb6bb12783d90cf52bf.jpg",
+        "https://i.pinimg.com/736x/18/33/4d/18334d4c223e87552566d28216d713c1.jpg",
+        "https://i.pinimg.com/736x/58/ea/81/58ea81c3aa505de6b5fd63e2a408b56f.jpg",
+        "https://i.pinimg.com/736x/f2/9e/12/f29e12626f56a6378a98fb6c2b8fb04f.jpg",
+        "https://i.pinimg.com/736x/1f/9d/99/1f9d9970b2625b05ce20e5f7010c2bf8.jpg",
+        "https://i.pinimg.com/736x/ed/bc/cc/edbccc2010e98c50d5cc013e7f7ad146.jpg",
+        "https://i.pinimg.com/736x/1d/50/60/1d50608f161ad14553b1bd4c7dd7abd3.jpg"
+      ]
+    }, null, 2));
+  }
+
+  app.get("/api/config", async (req, res) => {
+    try {
+      const data = await fs.readFile(CONFIG_FILE, "utf-8");
+      res.json(JSON.parse(data));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch config." });
+    }
+  });
+
+  app.post("/api/config", async (req, res) => {
+    try {
+      const config = req.body;
+      await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2));
+      res.json(config);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save config." });
+    }
+  });
+
   app.get("/api/wishes", async (req, res) => {
     try {
       const data = await fs.readFile(WISHES_FILE, "utf-8");

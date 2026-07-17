@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SEO from '../components/SEO';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
-const images = [
+const defaultImages = [
   "https://i.pinimg.com/736x/5b/fe/d7/5bfed7298601ac9c981fd5cb03a46fa5.jpg",
   "https://i.pinimg.com/736x/f6/3a/a3/f63aa3c3206dfd2baf03eb4782110437.jpg",
   "https://i.pinimg.com/736x/34/d0/fb/34d0fb4b34acbdb6bb12783d90cf52bf.jpg",
@@ -18,6 +18,18 @@ const images = [
 export default function Gallery() {
   const [selectedImg, setSelectedImg] = useState<string | null>(null);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [images, setImages] = useState<string[]>(defaultImages);
+
+  useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.galleryImages && data.galleryImages.length > 0) {
+          setImages(data.galleryImages);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   return (
     <>

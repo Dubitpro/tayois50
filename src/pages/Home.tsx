@@ -4,9 +4,8 @@ import SEO from '../components/SEO';
 import { ChevronDown, Sparkles, Clock, PenTool, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const calculateTimeLeft = () => {
-  // Let's set a date in the future for the Jubilee (August 9th)
-  const difference = +new Date("2026-08-09T00:00:00") - +new Date();
+const calculateTimeLeft = (targetDate: string = "2026-08-09T00:00:00") => {
+  const difference = +new Date(targetDate) - +new Date();
   let timeLeft = {
     days: 0,
     hours: 0,
@@ -30,8 +29,18 @@ export default function Home() {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 1000], [0, 300]);
   
+  const [config, setConfig] = useState<any>(null);
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
+  useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => {
+        setConfig(data);
+        setTimeLeft(calculateTimeLeft(data.countdownDate));
+      })
+      .catch(console.error);
+  }, []);
   
   // Hero Images State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -40,7 +49,7 @@ export default function Home() {
     "https://i.pinimg.com/736x/74/40/da/7440da71cf7f8fe433f39e62977c8f5a.jpg",
     "https://i.pinimg.com/736x/f1/e1/12/f1e112e87f4f46e64423d088fc0d1c8f.jpg"
   ];
-  const heroCaptions = [
+  const heroCaptions = config?.heroCaptions || [
     "A legacy of elegance and strength.",
     "Grace that transcends time.",
     "Radiance in every moment."
@@ -55,7 +64,7 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft());
+      setTimeLeft(calculateTimeLeft(config?.countdownDate));
     }, 1000);
 
     return () => clearTimeout(timer);
@@ -149,9 +158,9 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="font-sans text-sm md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4"
+            className="font-sans text-sm md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4 whitespace-pre-line"
           >
-            Celebrating 50 <br className="md:hidden" /> Glorious Years
+            {config?.heroTitleTop || "Celebrating 50 \n Glorious Years"}
           </motion.h2>
           
           <motion.h1 
@@ -161,7 +170,7 @@ export default function Home() {
             transition={{ duration: 1, delay: 0.6 }}
             className="font-cormorant text-6xl md:text-8xl lg:text-9xl font-medium mb-6 drop-shadow-lg"
           >
-            Golden Jubilee
+            {config?.heroTitleMain || "Golden Jubilee"}
           </motion.h1>
           
           <div className="h-12 md:h-20 mb-2 md:mb-4 max-w-2xl">

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "name": "King Charles",
+    "country": "United Kingdom",
+    "message": "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.",
+    "createdAt": "2026-07-17T17:43:08.313Z",
+    "likes": 0
+  },
+  {
+    "id": "2",
+    "name": "Amelia Windsor",
+    "country": "Monaco",
+    "message": "Fifty years of grace, resilience, and unyielding elegance. The world celebrates you today.",
+    "createdAt": "2026-07-17T17:43:08.313Z",
+    "likes": 0
+  },
+  {
+    "id": "3",
+    "name": "Sheikh Mohammed",
+    "country": "UAE",
+    "message": "Your visionary leadership has bridged continents. Wishing you a joyous and blessed Jubilee.",
+    "createdAt": "2026-07-17T17:43:08.313Z",
+    "likes": 0
+  },
+  {
+    "id": "4",
+    "name": "Victoria Beckham",
+    "country": "United Kingdom",
+    "message": "An icon of timeless style and strength. Happy Birthday to our glorious Queen.",
+    "createdAt": "2026-07-17T17:43:08.313Z",
+    "likes": 0
+  },
+  {
+    "id": "5",
+    "name": "Prime Minister",
+    "country": "Canada",
+    "message": "We honor your decades of service and dedication to global peace.",
+    "createdAt": "2026-07-17T17:43:08.313Z",
+    "likes": 0
+  },
+  {
+    "id": "6",
+    "name": "Elena Romanova",
+    "country": "Italy",
+    "message": "May your golden years be as radiant as the legacy you've built.",
+    "createdAt": "2026-07-17T17:43:08.313Z",
+    "likes": 0
+  }
+]

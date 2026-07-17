@@ -6,6 +6,9 @@ import fs from "fs/promises";
 
 async function startServer() {
   const app = express();
+  // PORT must remain 3000 for AI Studio preview.
+  // For cPanel Node.js deployments, Passenger will automatically intercept the listen call,
+  // or you can change this to process.env.PORT || 3000 after exporting the project.
   const PORT = 3000;
 
   app.use(express.json());
@@ -17,12 +20,12 @@ async function startServer() {
     await fs.access(WISHES_FILE);
   } catch {
     await fs.writeFile(WISHES_FILE, JSON.stringify([
-      { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", createdAt: new Date().toISOString() },
-      { id: '2', name: "Amelia Windsor", country: "Monaco", message: "Fifty years of grace, resilience, and unyielding elegance. The world celebrates you today.", createdAt: new Date().toISOString() },
-      { id: '3', name: "Sheikh Mohammed", country: "UAE", message: "Your visionary leadership has bridged continents. Wishing you a joyous and blessed Jubilee.", createdAt: new Date().toISOString() },
-      { id: '4', name: "Victoria Beckham", country: "United Kingdom", message: "An icon of timeless style and strength. Happy Birthday to our glorious Queen.", createdAt: new Date().toISOString() },
-      { id: '5', name: "Prime Minister", country: "Canada", message: "We honor your decades of service and dedication to global peace.", createdAt: new Date().toISOString() },
-      { id: '6', name: "Elena Romanova", country: "Italy", message: "May your golden years be as radiant as the legacy you've built.", createdAt: new Date().toISOString() }
+      { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", createdAt: new Date().toISOString(), likes: 0 },
+      { id: '2', name: "Amelia Windsor", country: "Monaco", message: "Fifty years of grace, resilience, and unyielding elegance. The world celebrates you today.", createdAt: new Date().toISOString(), likes: 0 },
+      { id: '3', name: "Sheikh Mohammed", country: "UAE", message: "Your visionary leadership has bridged continents. Wishing you a joyous and blessed Jubilee.", createdAt: new Date().toISOString(), likes: 0 },
+      { id: '4', name: "Victoria Beckham", country: "United Kingdom", message: "An icon of timeless style and strength. Happy Birthday to our glorious Queen.", createdAt: new Date().toISOString(), likes: 0 },
+      { id: '5', name: "Prime Minister", country: "Canada", message: "We honor your decades of service and dedication to global peace.", createdAt: new Date().toISOString(), likes: 0 },
+      { id: '6', name: "Elena Romanova", country: "Italy", message: "May your golden years be as radiant as the legacy you've built.", createdAt: new Date().toISOString(), likes: 0 }
     ], null, 2));
   }
 
@@ -35,6 +38,25 @@ async function startServer() {
     }
   });
 
+  app.post("/api/wishes/:id/like", async (req, res) => {
+    try {
+      const data = await fs.readFile(WISHES_FILE, "utf-8");
+      const wishes = JSON.parse(data);
+      const wishIndex = wishes.findIndex((w: any) => w.id === req.params.id);
+      
+      if (wishIndex === -1) {
+        return res.status(404).json({ error: "Wish not found" });
+      }
+
+      wishes[wishIndex].likes = (wishes[wishIndex].likes || 0) + 1;
+      await fs.writeFile(WISHES_FILE, JSON.stringify(wishes, null, 2));
+      
+      res.json(wishes[wishIndex]);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to like wish." });
+    }
+  });
+
   app.post("/api/wishes", async (req, res) => {
     try {
       const { name, country, message } = req.body;
@@ -42,7 +64,7 @@ async function startServer() {
       
       const data = await fs.readFile(WISHES_FILE, "utf-8");
       const wishes = JSON.parse(data);
-      const newWish = { id: Date.now().toString(), name, country, message, createdAt: new Date().toISOString() };
+      const newWish = { id: Date.now().toString(), name, country, message, createdAt: new Date().toISOString(), likes: 0 };
       wishes.unshift(newWish);
       await fs.writeFile(WISHES_FILE, JSON.stringify(wishes, null, 2));
       
@@ -90,7 +112,10 @@ async function startServer() {
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { 
+        middlewareMode: true,
+        hmr: false
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);

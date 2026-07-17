@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # API Routing
+  RewriteRule ^api/wishes/([^/]+)/like$ api/wishes.php?action=like&id=$1 [L,QSA]
+  RewriteRule ^api/wishes$ api/wishes.php [L,QSA]
+  RewriteRule ^api/generate-tribute$ api/generate-tribute.php [L,QSA]
+
+  # React Router fallback
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteRule . /index.html [L]
+</IfModule>

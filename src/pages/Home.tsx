@@ -102,33 +102,45 @@ export default function Home() {
       
 
       {/* Hero Section */}
-      <section className="relative min-h-[120vh] flex items-center justify-center overflow-hidden -mt-24 pt-24">
+      <section className="relative min-h-[100svh] lg:min-h-[120vh] flex items-center justify-center overflow-hidden -mt-24 pt-24">
         {/* Background Image / Gradient */}
         <div className="absolute inset-0 z-0 bg-elegant-black">
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-black/40 z-10" />
           
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentImageIndex}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.5, ease: "easeInOut" }}
-              className="absolute inset-0 w-full h-full"
-              style={{ y: heroY }}
-            >
-              <motion.img 
-                initial={{ scale: 1.05 }}
-                animate={{ scale: 1 }}
+          {/* Mobile Hero Image (Static) */}
+          <div className="absolute inset-0 w-full h-full md:hidden">
+            <img 
+              src="https://i.pinimg.com/736x/4b/62/ca/4b62caa88760bc422fa59197ed1fb1d8.jpg" 
+              alt="Royal Portrait Mobile" 
+              className="absolute inset-0 w-full h-full object-cover object-center"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
+          {/* Desktop Hero Images (Slideshow) */}
+          <div className="absolute inset-0 w-full h-full hidden md:block">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentImageIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 1.5, ease: "easeInOut" }}
-                src={heroImages[currentImageIndex]} 
-                alt="Royal Portrait" 
-                className="absolute inset-0 w-full h-full object-cover object-top md:object-[center_10%]"
-                referrerPolicy="no-referrer"
-              />
-            </motion.div>
-          </AnimatePresence>
+                className="absolute inset-0 w-full h-full"
+              >
+                <motion.img 
+                  initial={{ scale: 1.05 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                  src={heroImages[currentImageIndex]} 
+                  alt="Royal Portrait" 
+                  className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
+                  referrerPolicy="no-referrer"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
 
         <div className="container relative z-20 mx-auto px-6 text-left text-pearl-white">

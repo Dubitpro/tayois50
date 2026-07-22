@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
@@ -7,9 +7,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import MainLayout from './components/layout/MainLayout';
 
 // Pages
-import Home from './pages/Home';
-import Biography from './pages/Biography';
-import Gallery from './pages/Gallery';
 import Guestbook from './pages/Guestbook';
 import WishesWall from './pages/WishesWall';
 import Login from './pages/Login';
@@ -26,9 +23,7 @@ export default function App() {
           <Router>
             <Routes>
               <Route path="/" element={<MainLayout />}>
-                <Route index element={<Home />} />
-                <Route path="biography" element={<Biography />} />
-                <Route path="gallery" element={<Gallery />} />
+                <Route index element={<Navigate to="/wishes" replace />} />
                 <Route path="guestbook" element={<Guestbook />} />
                 <Route path="wishes" element={<WishesWall />} />
               </Route>

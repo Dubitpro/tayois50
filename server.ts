@@ -40,9 +40,11 @@ async function startServer() {
       heroTitleTop: "Celebrating 50 \n Glorious Years",
       heroTitleMain: "Golden Jubilee",
       heroCaptions: [
-        "A legacy of elegance and strength.",
-        "Grace that transcends time.",
-        "Radiance in every moment."
+        "A life beautified by God’s mercy",
+        "Vessel of divine brilliance",
+        "Demonstration of his unconditional love",
+        "Evidence of heaven’s gentle touch.",
+        "Living proof that God still does wonders"
       ],
       galleryImages: [
         "https://i.pinimg.com/736x/5b/fe/d7/5bfed7298601ac9c981fd5cb03a46fa5.jpg",

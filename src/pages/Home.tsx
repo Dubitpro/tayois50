@@ -50,9 +50,11 @@ export default function Home() {
     "https://i.pinimg.com/736x/f1/e1/12/f1e112e87f4f46e64423d088fc0d1c8f.jpg"
   ];
   const heroCaptions = config?.heroCaptions || [
-    "A legacy of elegance and strength.",
-    "Grace that transcends time.",
-    "Radiance in every moment."
+    "A life beautified by God’s mercy",
+    "Vessel of divine brilliance",
+    "Demonstration of his unconditional love",
+    "Evidence of heaven’s gentle touch.",
+    "Living proof that God still does wonders"
   ];
 
   // AI Generator State

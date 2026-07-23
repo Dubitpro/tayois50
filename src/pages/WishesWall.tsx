@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 import { Quote, Heart } from 'lucide-react';
+import { collection, getDocs, doc, updateDoc, increment, query, orderBy } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 interface Wish {
   id: string;
@@ -17,6 +19,22 @@ export default function WishesWall() {
   useEffect(() => {
     const fetchWishes = async () => {
       try {
+        try {
+          const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
+          const querySnapshot = await getDocs(q);
+          const data: Wish[] = [];
+          querySnapshot.forEach((doc) => {
+            data.push({ id: doc.id, ...doc.data() } as Wish);
+          });
+          
+          if (data.length > 0) {
+            setWishes(data);
+            return;
+          }
+        } catch (fbError) {
+          console.warn("Firebase fetch failed, falling back to local API", fbError);
+        }
+
         const response = await fetch('/api/wishes');
         if (response.ok) {
           const data = await response.json();
@@ -26,11 +44,23 @@ export default function WishesWall() {
         console.error("Error fetching wishes", error);
       }
     };
+
     fetchWishes();
   }, []);
 
   const handleLike = async (id: string) => {
     try {
+      try {
+        const wishRef = doc(db, 'wishes', id);
+        await updateDoc(wishRef, {
+          likes: increment(1)
+        });
+        setWishes(wishes.map(w => w.id === id ? { ...w, likes: (w.likes || 0) + 1 } : w));
+        return;
+      } catch (fbError) {
+         console.warn("Firebase update failed, falling back to local API", fbError);
+      }
+
       const response = await fetch(`/api/wishes/${id}/like`, { method: 'POST' });
       if (response.ok) {
         const updatedWish = await response.json();

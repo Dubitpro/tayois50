@@ -5,6 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PenTool, Loader2 } from 'lucide-react';
+import { collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
 const guestbookSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -20,6 +22,7 @@ interface GuestbookEntry {
   country: string;
   message: string;
   createdAt: string;
+  likes?: number;
 }
 
 export default function Guestbook() {
@@ -38,6 +41,24 @@ export default function Guestbook() {
 
   const fetchEntries = async () => {
     try {
+      // First try to fetch from Firebase
+      try {
+        const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const data: GuestbookEntry[] = [];
+        querySnapshot.forEach((doc) => {
+          data.push({ id: doc.id, ...doc.data() } as GuestbookEntry);
+        });
+        
+        if (data.length > 0) {
+          setEntries(data);
+          return;
+        }
+      } catch (fbError) {
+        console.warn("Firebase fetch failed, falling back to local API", fbError);
+      }
+
+      // Fallback to local API for development if Firebase is not configured
       const response = await fetch('/api/wishes');
       if (response.ok) {
         const data = await response.json();
@@ -52,21 +73,33 @@ export default function Guestbook() {
     setIsSubmitting(true);
     setSubmitError(null);
     setSubmitSuccess(false);
+
     try {
-      const response = await fetch('/api/wishes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      
-      if (!response.ok) throw new Error("Failed to post");
+      try {
+        // Try Firebase first
+        await addDoc(collection(db, 'wishes'), {
+          ...data,
+          createdAt: serverTimestamp(),
+          likes: 0
+        });
+      } catch (fbError) {
+        console.warn("Firebase save failed, falling back to local API", fbError);
+        // Fallback to local API
+        const response = await fetch('/api/wishes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) throw new Error("Failed to post");
+      }
       
       setSubmitSuccess(true);
       reset();
       fetchEntries();
     } catch (error) {
       console.error("Error adding document: ", error);
-      setSubmitError("Failed to sign the guestbook. Please try again.");
+      setSubmitError("Failed to sign the guestbook. Please try again. Ensure Firebase Environment Variables are set in Netlify.");
     } finally {
       setIsSubmitting(false);
     }

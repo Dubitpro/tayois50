@@ -3,7 +3,7 @@ import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 import { Quote, Heart } from 'lucide-react';
 import { collection, getDocs, doc, updateDoc, increment, query, orderBy } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db, isFirebaseConfigured } from '../firebase/config';
 
 interface Wish {
   id: string;
@@ -13,32 +13,57 @@ interface Wish {
   likes?: number;
 }
 
+const withTimeout = <T,>(promise: Promise<T>, ms: number = 3000): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Firebase operation timed out')), ms))
+  ]);
+};
+
 export default function WishesWall() {
   const [wishes, setWishes] = useState<Wish[]>([]);
 
   useEffect(() => {
     const fetchWishes = async () => {
       try {
+        if (isFirebaseConfigured) {
+          try {
+            const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
+            const querySnapshot = await withTimeout(getDocs(q));
+            const data: Wish[] = [];
+            querySnapshot.forEach((doc) => {
+              data.push({ id: doc.id, ...doc.data() } as Wish);
+            });
+            
+            if (data.length > 0) {
+              setWishes(data);
+              return;
+            }
+          } catch (fbError) {
+            console.warn("Firebase fetch failed", fbError);
+          }
+        }
+
         try {
-          const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
-          const querySnapshot = await getDocs(q);
-          const data: Wish[] = [];
-          querySnapshot.forEach((doc) => {
-            data.push({ id: doc.id, ...doc.data() } as Wish);
-          });
-          
-          if (data.length > 0) {
+          const response = await fetch('/api/wishes');
+          if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+            const data = await response.json();
             setWishes(data);
             return;
           }
-        } catch (fbError) {
-          console.warn("Firebase fetch failed, falling back to local API", fbError);
+        } catch (apiError) {
+          console.warn("API fetch failed", apiError);
         }
 
-        const response = await fetch('/api/wishes');
-        if (response.ok) {
-          const data = await response.json();
-          setWishes(data);
+        // Fallback to localStorage for Netlify without Firebase
+        const localWishes = localStorage.getItem('wishes');
+        if (localWishes) {
+          setWishes(JSON.parse(localWishes));
+        } else {
+          // Default mock data
+          setWishes([
+            { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", likes: 0 }
+          ]);
         }
       } catch (error) {
         console.error("Error fetching wishes", error);
@@ -50,21 +75,48 @@ export default function WishesWall() {
 
   const handleLike = async (id: string) => {
     try {
-      try {
-        const wishRef = doc(db, 'wishes', id);
-        await updateDoc(wishRef, {
-          likes: increment(1)
-        });
-        setWishes(wishes.map(w => w.id === id ? { ...w, likes: (w.likes || 0) + 1 } : w));
-        return;
-      } catch (fbError) {
-         console.warn("Firebase update failed, falling back to local API", fbError);
+      let isUpdated = false;
+
+      if (isFirebaseConfigured) {
+        try {
+          const wishRef = doc(db, 'wishes', id);
+          await withTimeout(updateDoc(wishRef, {
+            likes: increment(1)
+          }));
+          isUpdated = true;
+        } catch (fbError) {
+          console.warn("Firebase update failed", fbError);
+        }
       }
 
-      const response = await fetch(`/api/wishes/${id}/like`, { method: 'POST' });
-      if (response.ok) {
-        const updatedWish = await response.json();
-        setWishes(wishes.map(w => w.id === id ? updatedWish : w));
+      if (!isUpdated) {
+        try {
+          const response = await fetch(`/api/wishes/${id}/like`, { method: 'POST' });
+          if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+            isUpdated = true;
+          }
+        } catch (apiError) {
+          console.warn("API update failed", apiError);
+        }
+      }
+
+      if (!isUpdated) {
+        // Fallback to localStorage
+        try {
+          const localWishes = localStorage.getItem('wishes');
+          if (localWishes) {
+            const parsedWishes = JSON.parse(localWishes);
+            const updated = parsedWishes.map((w: Wish) => w.id === id ? { ...w, likes: (w.likes || 0) + 1 } : w);
+            localStorage.setItem('wishes', JSON.stringify(updated));
+            isUpdated = true;
+          }
+        } catch (storageError) {
+          console.warn("LocalStorage update failed", storageError);
+        }
+      }
+
+      if (isUpdated) {
+        setWishes(wishes.map(w => w.id === id ? { ...w, likes: (w.likes || 0) + 1 } : w));
       }
     } catch (error) {
       console.error("Error liking wish", error);

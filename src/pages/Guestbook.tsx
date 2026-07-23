@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PenTool, Loader2 } from 'lucide-react';
 import { collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db, isFirebaseConfigured } from '../firebase/config';
 
 const guestbookSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -25,6 +25,13 @@ interface GuestbookEntry {
   likes?: number;
 }
 
+const withTimeout = <T,>(promise: Promise<T>, ms: number = 3000): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Firebase operation timed out')), ms))
+  ]);
+};
+
 export default function Guestbook() {
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,27 +49,45 @@ export default function Guestbook() {
   const fetchEntries = async () => {
     try {
       // First try to fetch from Firebase
-      try {
-        const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const data: GuestbookEntry[] = [];
-        querySnapshot.forEach((doc) => {
-          data.push({ id: doc.id, ...doc.data() } as GuestbookEntry);
-        });
-        
-        if (data.length > 0) {
-          setEntries(data);
-          return;
+      if (isFirebaseConfigured) {
+        try {
+          const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
+          const querySnapshot = await withTimeout(getDocs(q));
+          const data: GuestbookEntry[] = [];
+          querySnapshot.forEach((doc) => {
+            data.push({ id: doc.id, ...doc.data() } as GuestbookEntry);
+          });
+          
+          if (data.length > 0) {
+            setEntries(data);
+            return;
+          }
+        } catch (fbError) {
+          console.warn("Firebase fetch failed", fbError);
         }
-      } catch (fbError) {
-        console.warn("Firebase fetch failed, falling back to local API", fbError);
       }
 
       // Fallback to local API for development if Firebase is not configured
-      const response = await fetch('/api/wishes');
-      if (response.ok) {
-        const data = await response.json();
-        setEntries(data);
+      try {
+        const response = await fetch('/api/wishes');
+        if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+          const data = await response.json();
+          setEntries(data);
+          return;
+        }
+      } catch (apiError) {
+        console.warn("API fetch failed", apiError);
+      }
+
+      // Fallback to localStorage for Netlify without Firebase
+      const localWishes = localStorage.getItem('wishes');
+      if (localWishes) {
+        setEntries(JSON.parse(localWishes));
+      } else {
+        // Default mock data
+        setEntries([
+          { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", createdAt: new Date().toISOString(), likes: 0 }
+        ]);
       }
     } catch (error) {
       console.error("Error fetching guestbook entries:", error);
@@ -74,16 +99,31 @@ export default function Guestbook() {
     setSubmitError(null);
     setSubmitSuccess(false);
 
-    try {
+    const newWish = {
+      ...data,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      likes: 0
+    };
+
+    let isSaved = false;
+
+    if (isFirebaseConfigured) {
       try {
         // Try Firebase first
-        await addDoc(collection(db, 'wishes'), {
+        await withTimeout(addDoc(collection(db, 'wishes'), {
           ...data,
           createdAt: serverTimestamp(),
           likes: 0
-        });
+        }));
+        isSaved = true;
       } catch (fbError) {
-        console.warn("Firebase save failed, falling back to local API", fbError);
+        console.warn("Firebase save failed", fbError);
+      }
+    }
+
+    if (!isSaved) {
+      try {
         // Fallback to local API
         const response = await fetch('/api/wishes', {
           method: 'POST',
@@ -91,18 +131,38 @@ export default function Guestbook() {
           body: JSON.stringify(data)
         });
         
-        if (!response.ok) throw new Error("Failed to post");
+        if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+          isSaved = true;
+        }
+      } catch (apiError) {
+        console.warn("API save failed", apiError);
       }
-      
+    }
+
+    if (!isSaved) {
+      // Fallback to localStorage (Netlify no backend)
+      try {
+        const localWishes = localStorage.getItem('wishes');
+        const parsedWishes = localWishes ? JSON.parse(localWishes) : [
+          { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", createdAt: new Date().toISOString(), likes: 0 }
+        ];
+        parsedWishes.unshift(newWish);
+        localStorage.setItem('wishes', JSON.stringify(parsedWishes));
+        isSaved = true;
+      } catch (storageError) {
+        console.warn("LocalStorage save failed", storageError);
+      }
+    }
+
+    if (isSaved) {
       setSubmitSuccess(true);
       reset();
       fetchEntries();
-    } catch (error) {
-      console.error("Error adding document: ", error);
-      setSubmitError("Failed to sign the guestbook. Please try again. Ensure Firebase Environment Variables are set in Netlify.");
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      setSubmitError("Failed to sign the guestbook. Please try again.");
     }
+    
+    setIsSubmitting(false);
   };
 
   return (

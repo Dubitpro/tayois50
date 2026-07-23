@@ -71,7 +71,7 @@ export default function MainLayout() {
       <audio
         ref={audioRef}
         loop
-        src="https://cdn.pixabay.com/audio/2022/01/26/audio_d0c6ff1bfd.mp3" 
+        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" 
       />
 
       <motion.main 

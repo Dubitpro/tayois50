@@ -124,6 +124,101 @@ async function startServer() {
     }
   });
 
+  const syncSocialComments = async () => {
+    const fbToken = process.env.FACEBOOK_ACCESS_TOKEN;
+    const fbPostId = process.env.FACEBOOK_POST_ID;
+    const igToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    const igMediaId = process.env.INSTAGRAM_MEDIA_ID;
+
+    if (!fbToken && !igToken) {
+      return { error: "Social integration not configured." };
+    }
+
+    try {
+      const data = await fs.readFile(WISHES_FILE, "utf-8");
+      const wishes = JSON.parse(data);
+      let newWishesCount = 0;
+
+      // Sync Facebook
+      if (fbToken && fbPostId) {
+        try {
+          const fbResponse = await fetch(`https://graph.facebook.com/v19.0/${fbPostId}/comments?access_token=${fbToken}`);
+          if (fbResponse.ok) {
+            const fbData = await fbResponse.json();
+            for (const comment of fbData.data || []) {
+              if (!wishes.find((w: any) => w.id === `fb_${comment.id}`)) {
+                wishes.unshift({
+                  id: `fb_${comment.id}`,
+                  name: comment.from?.name || "Facebook User",
+                  country: "Facebook",
+                  message: comment.message,
+                  createdAt: comment.created_time,
+                  likes: 0
+                });
+                newWishesCount++;
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Facebook sync error:", e);
+        }
+      }
+
+      // Sync Instagram
+      if (igToken && igMediaId) {
+        try {
+          const igResponse = await fetch(`https://graph.facebook.com/v19.0/${igMediaId}/comments?access_token=${igToken}`);
+          if (igResponse.ok) {
+            const igData = await igResponse.json();
+            for (const comment of igData.data || []) {
+              if (!wishes.find((w: any) => w.id === `ig_${comment.id}`)) {
+                wishes.unshift({
+                  id: `ig_${comment.id}`,
+                  name: comment.username || "Instagram User",
+                  country: "Instagram",
+                  message: comment.text,
+                  createdAt: comment.timestamp,
+                  likes: 0
+                });
+                newWishesCount++;
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Instagram sync error:", e);
+        }
+      }
+
+      if (newWishesCount > 0) {
+        await fs.writeFile(WISHES_FILE, JSON.stringify(wishes, null, 2));
+      }
+      return { success: true, count: newWishesCount };
+    } catch (error) {
+      console.error("Social sync error:", error);
+      return { error: "Failed to sync social comments." };
+    }
+  };
+
+  // Run automatic sync every 10 minutes
+  setInterval(async () => {
+    console.log("Running automatic social sync...");
+    const result = await syncSocialComments();
+    if (result.success && result.count! > 0) {
+      console.log(`Auto-sync pulled ${result.count} new comments.`);
+    }
+  }, 10 * 60 * 1000);
+
+  app.post("/api/sync-social", async (req, res) => {
+    const result = await syncSocialComments();
+    if (result.error) {
+      if (result.error === "Social integration not configured.") {
+        return res.status(400).json({ error: "Social integration not configured. Please set FACEBOOK_ACCESS_TOKEN or INSTAGRAM_ACCESS_TOKEN in your environment variables. You must create a Meta Developer App and generate access tokens to use this feature." });
+      }
+      return res.status(500).json({ error: result.error });
+    }
+    res.json({ success: true, message: `Synced ${result.count} new comments.` });
+  });
+
   // API Route: Generate AI Royal Tribute
   app.post("/api/generate-tribute", async (req, res) => {
     try {

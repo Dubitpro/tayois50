@@ -84,7 +84,23 @@ export default function AdminDashboard() {
           <div className="flex-1 overflow-y-auto p-8 md:p-12">
             {activeTab === 'dashboard' ? (
               <>
-                <h1 className="font-cormorant text-4xl text-elegant-black mb-2">Welcome to the Royal Quarters</h1>
+                <div className="flex justify-between items-center mb-2">
+                  <h1 className="font-cormorant text-4xl text-elegant-black">Welcome to the Royal Quarters</h1>
+                  <button 
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("/api/sync-social", { method: "POST" });
+                        const data = await res.json();
+                        alert(data.message || data.error);
+                      } catch(e) {
+                        alert("Failed to sync comments");
+                      }
+                    }}
+                    className="bg-elegant-black text-luxury-gold px-4 py-2 text-xs uppercase tracking-widest hover:bg-elegant-black/90 transition-colors"
+                  >
+                    Sync Social Comments
+                  </button>
+                </div>
                 <p className="font-sans text-elegant-black/60 mb-10">Manage the Golden Jubilee celebrations and content.</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                   <div className="bg-pearl-white p-6 border border-luxury-gold/20 shadow-sm">

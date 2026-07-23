@@ -43,7 +43,7 @@ export default function WishesWall() {
 
   return (
     <>
-      <SEO title="Wishes Wall" description="Heartfelt messages from dignitaries, royal families, and admirers across the globe." />
+      <SEO title="Wishes Wall" description="Heartfelt messages from family, friends & admirers across the globe" />
         
       
 
@@ -54,7 +54,7 @@ export default function WishesWall() {
             <h1 className="font-cormorant text-5xl md:text-7xl text-elegant-black mb-6">Wishes from the World</h1>
             <div className="w-24 h-[2px] bg-luxury-gold mx-auto mb-8"></div>
             <p className="font-serif text-xl italic text-elegant-black/70 max-w-2xl mx-auto">
-              Heartfelt messages from dignitaries, royal families, and admirers across the globe.
+              Heartfelt messages from family, friends & admirers across the globe
             </p>
           </div>
 

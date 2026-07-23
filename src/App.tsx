@@ -7,6 +7,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import MainLayout from './components/layout/MainLayout';
 
 // Pages
+import Home from './pages/Home';
+import Biography from './pages/Biography';
+import Gallery from './pages/Gallery';
 import Guestbook from './pages/Guestbook';
 import WishesWall from './pages/WishesWall';
 import Login from './pages/Login';

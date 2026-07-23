@@ -5,9 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 const navLinks = [
-  { title: 'Home', path: '/' },
-  { title: 'Biography', path: '/biography' },
-  { title: 'Gallery', path: '/gallery' },
   { title: 'Wishes Wall', path: '/wishes' },
   { title: 'Guestbook', path: '/guestbook' },
 ];

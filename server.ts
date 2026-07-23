@@ -219,7 +219,7 @@ async function startServer() {
     res.json({ success: true, message: `Synced ${result.count} new comments.` });
   });
 
-  // API Route: Generate AI Royal Tribute
+  // API Route: Generate AI Tribute
   app.post("/api/generate-tribute", async (req, res) => {
     try {
       if (!process.env.GEMINI_API_KEY) {
@@ -237,9 +237,9 @@ async function startServer() {
 
       const { name, country, tone } = req.body;
 
-      const prompt = `Write a short, highly elegant and luxurious 50th Golden Jubilee birthday tribute for Her Majesty The Queen.
+      const prompt = `Write a short, highly elegant and luxurious 50th Golden Jubilee birthday tribute for The Queen.
       The tribute should be signed by ${name} from ${country}.
-      Tone: ${tone || 'respectful, royal, and poetic'}.
+      Tone: ${tone || 'respectful, and poetic'}.
       Keep it under 3 sentences. No placeholders. Just the message.`;
 
       const response = await ai.models.generateContent({

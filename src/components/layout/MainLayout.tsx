@@ -14,7 +14,7 @@ export default function MainLayout() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2500); // 2.5 seconds royal reveal
+    }, 2500); // 2.5 seconds reveal
     return () => clearTimeout(timer);
   }, []);
 
@@ -34,7 +34,7 @@ export default function MainLayout() {
       <AnimatePresence>
         {loading && (
           <motion.div
-            key="royal-curtain"
+            key="curtain"
             initial={{ y: 0 }}
             exit={{ y: '-100%' }}
             transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
@@ -67,7 +67,7 @@ export default function MainLayout() {
         {isPlaying ? <Music size={20} /> : <VolumeX size={20} />}
       </button>
 
-      {/* Royalty Free Classical Music */}
+      {/*Free Classical Music */}
       <audio
         ref={audioRef}
         loop

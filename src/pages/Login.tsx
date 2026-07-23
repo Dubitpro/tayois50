@@ -30,7 +30,7 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/admin');
     } catch (err: any) {
-      setError('Invalid royal credentials.');
+      setError('Invalid credentials.');
     } finally {
       setLoading(false);
     }
@@ -38,7 +38,7 @@ export default function Login() {
 
   return (
     <>
-      <SEO title="Royal Admin Login" description="Secure access for royal administration." />
+      <SEO title="Admin Login" description="Secure access for administration." />
         
       
       <div className="min-h-screen bg-elegant-black flex flex-col items-center justify-center p-6">
@@ -47,7 +47,7 @@ export default function Login() {
           
           <div className="text-center mb-10">
             <Crown className="w-12 h-12 text-luxury-gold mx-auto mb-4" />
-            <h1 className="font-cormorant text-3xl text-elegant-black">Royal Quarters</h1>
+            <h1 className="font-cormorant text-3xl text-elegant-black">Quarters</h1>
             <p className="font-sans text-xs uppercase tracking-widest text-elegant-black/50 mt-2">Authorized Personnel Only</p>
           </div>
 

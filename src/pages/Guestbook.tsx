@@ -167,7 +167,7 @@ export default function Guestbook() {
 
   return (
     <>
-      <SEO title="Royal Guestbook" description="Leave a congratulatory message for Her Majesty on her Golden Jubilee." />
+      <SEO title="Guestbook" description="Leave a congratulatory message on her Golden Jubilee." />
         
       
 
@@ -176,9 +176,9 @@ export default function Guestbook() {
           
           <div className="text-center mb-16">
             <PenTool className="w-12 h-12 text-luxury-gold mx-auto mb-6" />
-            <h1 className="font-cormorant text-5xl md:text-7xl text-elegant-black mb-6">The Royal Guestbook</h1>
+            <h1 className="font-cormorant text-5xl md:text-7xl text-elegant-black mb-6">The Guestbook</h1>
             <div className="w-24 h-[2px] bg-luxury-gold mx-auto mb-8"></div>
-            <p className="font-serif text-xl italic text-elegant-black/70">Leave a congratulatory message for Her Majesty.</p>
+            <p className="font-serif text-xl italic text-elegant-black/70">Leave a congratulatory message .</p>
           </div>
 
           {/* Form */}
@@ -187,7 +187,7 @@ export default function Guestbook() {
             
             {submitSuccess && (
               <div className="mb-8 p-4 bg-green-50 border border-green-200 text-green-800 font-sans text-sm text-center">
-                Your message has been graciously received in the Royal Guestbook.
+                Your message has been graciously received in the Guestbook.
               </div>
             )}
             

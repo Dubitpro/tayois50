@@ -14,7 +14,7 @@ export default function SEO({
   image = "https://images.unsplash.com/photo-1542314831-c6a4d14d285c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80", 
   url = "https://golden-jubilee-tribute.com" 
 }: SEOProps) {
-  const fullTitle = `${title} | Royal Golden Jubilee`;
+  const fullTitle = `${title} | Golden Jubilee`;
   
   return (
     <Helmet>

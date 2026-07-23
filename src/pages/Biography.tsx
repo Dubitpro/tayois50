@@ -16,7 +16,7 @@ export default function Biography() {
 
   return (
     <>
-      <SEO title="Biography" description="Discover the extraordinary journey and 50-year legacy of Her Majesty The Queen." />
+      <SEO title="Biography" description="Discover the extraordinary journey and 50-year legacy of The Queen." />
         
       
 
@@ -54,10 +54,10 @@ export default function Biography() {
             >
               <h2 className="font-cormorant text-4xl text-elegant-black">A Visionary Leader</h2>
               <p className="font-sans text-elegant-black/80 leading-relaxed text-lg">
-                For half a century, Her Majesty has been a beacon of hope and a symbol of unwavering elegance. Through visionary leadership and a profound commitment to humanity, she has transformed the landscape of global philanthropy and business.
+                For half a century, She has been a beacon of hope and a symbol of unwavering elegance. Through visionary leadership and a profound commitment to humanity, she has transformed the landscape of global philanthropy and business.
               </p>
               <p className="font-sans text-elegant-black/80 leading-relaxed text-lg">
-                Her royal legacy is not merely defined by titles, but by the countless lives touched through her foundations, her pioneering spirit in entrepreneurship, and her timeless grace that continues to inspire generations.
+                Her legacy is not merely defined by titles, but by the countless lives touched through her foundations, her pioneering spirit in entrepreneurship, and her timeless grace that continues to inspire generations.
               </p>
             </motion.div>
           </div>

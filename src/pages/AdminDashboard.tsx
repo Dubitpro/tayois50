@@ -17,7 +17,7 @@ export default function AdminDashboard() {
 
   return (
     <>
-      <SEO title="Royal Admin | Dashboard" description="Manage the Golden Jubilee celebrations." />
+      <SEO title="Admin | Dashboard" description="Manage the Golden Jubilee celebrations." />
         
       
       <div className="min-h-screen bg-soft-ivory flex">
@@ -25,7 +25,7 @@ export default function AdminDashboard() {
         <aside className="w-64 bg-elegant-black text-pearl-white flex flex-col hidden md:flex">
           <div className="p-8 text-center border-b border-luxury-gold/20">
             <Crown className="w-10 h-10 text-luxury-gold mx-auto mb-4" />
-            <h2 className="font-cormorant text-xl text-luxury-gold">Royal Admin</h2>
+            <h2 className="font-cormorant text-xl text-luxury-gold">Admin</h2>
           </div>
           <nav className="flex-1 py-8">
             <ul className="space-y-2 px-4">
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
           {/* Mobile Header */}
           <header className="md:hidden bg-elegant-black text-luxury-gold p-4 flex justify-between items-center">
             <Crown size={24} />
-            <span className="font-cormorant text-xl">Royal Admin</span>
+            <span className="font-cormorant text-xl">Admin</span>
             <button onClick={handleLogout}><LogOut size={20} /></button>
           </header>
 
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
             {activeTab === 'dashboard' ? (
               <>
                 <div className="flex justify-between items-center mb-2">
-                  <h1 className="font-cormorant text-4xl text-elegant-black">Welcome to the Royal Quarters</h1>
+                  <h1 className="font-cormorant text-4xl text-elegant-black">Welcome to the Quarters</h1>
                   <button 
                     onClick={async () => {
                       try {

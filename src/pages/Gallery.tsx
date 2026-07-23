@@ -33,7 +33,7 @@ export default function Gallery() {
 
   return (
     <>
-      <SEO title="Royal Gallery" description="A curated collection of golden memories from the 50th Golden Jubilee." />
+      <SEO title="Gallery" description="A curated collection of golden memories from the 50th Golden Jubilee." />
         
       
 
@@ -41,7 +41,7 @@ export default function Gallery() {
         <div className="container mx-auto px-6 max-w-6xl">
           
           <div className="text-center mb-16">
-            <h1 className="font-cormorant text-5xl md:text-7xl text-elegant-black mb-6">Royal Gallery</h1>
+            <h1 className="font-cormorant text-5xl md:text-7xl text-elegant-black mb-6">Gallery</h1>
             <div className="w-24 h-[2px] bg-luxury-gold mx-auto mb-8"></div>
             <p className="font-serif text-xl italic text-elegant-black/70">A curated collection of golden memories.</p>
           </div>
@@ -63,7 +63,7 @@ export default function Gallery() {
                 <div className="absolute inset-0 bg-elegant-black/20 group-hover:bg-transparent transition-all duration-500 z-10" />
                 <img 
                   src={src} 
-                  alt={`Royal Memory ${index + 1}`} 
+                  alt={`Memory ${index + 1}`} 
                   className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
                 />
               </motion.div>
@@ -112,7 +112,7 @@ export default function Gallery() {
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.9 }}
                 src={selectedImg} 
-                alt="Enlarged Royal Memory"
+                alt="Enlarged Memory"
                 className="max-w-[90vw] max-h-[90vh] object-contain border-4 border-luxury-gold/50 shadow-2xl"
                 draggable={false}
               />

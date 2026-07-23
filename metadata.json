@@ -1,6 +1,6 @@
 {
   "name": "Golden Jubilee Tribute",
-  "description": "A luxury birthday tribute website for a 50th Golden Jubilee celebrating with royal elegance.",
+  "description": "A luxury birthday tribute website for a 50th Golden Jubilee celebrating with elegance.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

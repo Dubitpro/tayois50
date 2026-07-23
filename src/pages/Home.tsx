@@ -60,7 +60,7 @@ export default function Home() {
   // AI Generator State
   const [aiName, setAiName] = useState('');
   const [aiCountry, setAiCountry] = useState('');
-  const [aiTone, setAiTone] = useState('respectful, royal, and poetic');
+  const [aiTone, setAiTone] = useState('respectful,, and poetic');
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiResult, setAiResult] = useState('');
 
@@ -96,7 +96,7 @@ export default function Home() {
       if (data.message) {
         setAiResult(data.message);
       } else {
-        setAiResult("The royal scribes are currently unavailable. Please try again later.");
+        setAiResult("The scribes are currently unavailable. Please try again later.");
       }
     } catch (error) {
       setAiResult("An error occurred while crafting your tribute.");
@@ -107,7 +107,7 @@ export default function Home() {
 
   return (
     <>
-      <SEO title="Home" description="Celebrating the 50th Golden Jubilee of our beloved Queen with an elegant, royal tribute." />
+      <SEO title="Home" description="Celebrating the 50th Golden Jubilee of our beloved Queen with an elegant, tribute." />
         
         
       
@@ -123,7 +123,7 @@ export default function Home() {
           <div className="absolute inset-0 w-full h-full md:hidden">
             <img 
               src="https://i.pinimg.com/736x/4b/62/ca/4b62caa88760bc422fa59197ed1fb1d8.jpg" 
-              alt="Royal Portrait Mobile" 
+              alt="Portrait Mobile" 
               className="absolute inset-0 w-full h-full object-cover object-[center_top]"
               referrerPolicy="no-referrer"
             />
@@ -145,7 +145,7 @@ export default function Home() {
                   animate={{ scale: 1 }}
                   transition={{ duration: 1.5, ease: "easeInOut" }}
                   src={heroImages[currentImageIndex]} 
-                  alt="Royal Portrait" 
+                  alt="Portrait" 
                   className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
                   referrerPolicy="no-referrer"
                 />
@@ -209,9 +209,12 @@ export default function Home() {
 
             <Link 
               to="/guestbook" 
-              className="inline-block border border-luxury-gold text-luxury-gold hover:bg-luxury-gold hover:text-elegant-black transition-all duration-500 px-4 py-2 md:px-6 md:py-3 uppercase tracking-[0.2em] text-[10px] md:text-xs font-medium"
+              className="mt-6 inline-flex items-center justify-center gap-3 bg-luxury-gold text-elegant-black hover:bg-white transition-all duration-500 px-8 py-5 md:px-10 md:py-6 rounded shadow-[0_0_20px_rgba(212,175,55,0.4)] w-full sm:w-auto"
             >
-              Sign the Guestbook
+              <PenTool className="w-6 h-6 md:w-8 md:h-8" />
+              <span className="font-sans text-base md:text-xl font-bold uppercase tracking-[0.1em]">
+                Drop a Congratulatory Message
+              </span>
             </Link>
           </motion.div>
         </div>
@@ -233,7 +236,7 @@ export default function Home() {
           </h3>
           <div className="w-16 h-[2px] bg-luxury-gold mx-auto mb-6"></div>
           <p className="font-sans uppercase tracking-widest text-sm text-elegant-black/60 mb-8">
-            Her Majesty The Queen
+            The Queen
           </p>
           <div className="flex justify-center opacity-80">
             <svg width="250" height="80" viewBox="0 0 250 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform scale-125">
@@ -271,7 +274,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
               { title: "The Legacy", desc: "Explore fifty years of outstanding achievements and global impact.", link: "/biography" },
-              { title: "Royal Gallery", desc: "A curated collection of unforgettable moments in time.", link: "/gallery" },
+              { title: "Gallery", desc: "A curated collection of unforgettable moments in time.", link: "/gallery" },
               { title: "Wishes Wall", desc: "Read heartfelt messages from dignitaries and citizens worldwide.", link: "/wishes" }
             ].map((item, idx) => (
               <motion.div 
@@ -299,13 +302,12 @@ export default function Home() {
         <div className="container mx-auto px-6 max-w-4xl">
           <div className="text-center mb-16">
             <PenTool className="w-8 h-8 text-luxury-gold mx-auto mb-6" />
-            <h2 className="font-cormorant text-4xl md:text-5xl text-elegant-black mb-6">Draft a Royal Tribute</h2>
+            <h2 className="font-cormorant text-4xl md:text-5xl text-elegant-black mb-6">Draft a Tribute</h2>
             <div className="w-16 h-[2px] bg-luxury-gold mx-auto mb-6"></div>
             <p className="font-serif italic text-elegant-black/70 text-lg">
-              Allow our royal scribes (AI) to craft a beautifully articulated message on your behalf.
+              Allow our scribes (AI) to craft a beautifully articulated message on your behalf.
             </p>
           </div>
-
           <div className="bg-pearl-white p-8 md:p-12 border border-luxury-gold/30 shadow-sm relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-luxury-gold to-transparent"></div>
             
@@ -342,12 +344,11 @@ export default function Home() {
                   onChange={(e) => setAiTone(e.target.value)}
                   className="w-full bg-transparent border-b border-luxury-gold/40 py-2 focus:outline-none focus:border-luxury-gold transition-colors font-serif text-lg appearance-none cursor-pointer"
                 >
-                  <option value="respectful, royal, and poetic">Respectful & Poetic</option>
+                  <option value="respectful,, and poetic">Respectful & Poetic</option>
                   <option value="grand, historic, and celebratory">Grand & Celebratory</option>
                   <option value="warm, heartfelt, and graceful">Warm & Heartfelt</option>
                 </select>
               </div>
-
               <div className="text-center pt-6">
                 <button 
                   type="submit" 
@@ -383,6 +384,17 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Floating CTA for Elder Users */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-sm pointer-events-auto shadow-2xl">
+        <Link 
+          to="/guestbook"
+          className="flex items-center justify-center gap-3 bg-luxury-gold text-elegant-black hover:bg-white transition-all duration-300 py-4 px-6 rounded-full font-sans font-bold text-base md:text-lg uppercase tracking-wider text-center border-2 border-transparent hover:border-luxury-gold"
+        >
+          <PenTool className="w-6 h-6 shrink-0" />
+          <span>Drop a Message</span>
+        </Link>
+      </div>
     </>
   );
 }

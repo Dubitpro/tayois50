@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -9,24 +9,14 @@ import { cn } from '../../lib/utils';
 export default function MainLayout() {
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500); // 2.5 seconds reveal
-    return () => clearTimeout(timer);
-  }, []);
+  const handleEnter = () => {
+    setLoading(false);
+    setIsPlaying(true);
+  };
 
   const toggleMusic = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
+    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -44,13 +34,20 @@ export default function MainLayout() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="text-center"
+              className="text-center flex flex-col items-center"
             >
               <Crown className="w-20 h-20 text-luxury-gold mx-auto mb-6" />
               <h1 className="font-cormorant text-4xl md:text-6xl text-luxury-gold tracking-widest uppercase">
                 Golden Jubilee
               </h1>
-              <div className="mt-8 w-px h-24 bg-gradient-to-b from-luxury-gold to-transparent mx-auto"></div>
+              <div className="mt-8 mb-12 w-px h-16 bg-gradient-to-b from-luxury-gold to-transparent mx-auto"></div>
+              
+              <button
+                onClick={handleEnter}
+                className="px-8 py-3 border border-luxury-gold text-luxury-gold font-sans text-sm uppercase tracking-widest hover:bg-luxury-gold hover:text-elegant-black transition-colors duration-300"
+              >
+                Enter Celebration
+              </button>
             </motion.div>
           </motion.div>
         )}
@@ -67,12 +64,20 @@ export default function MainLayout() {
         {isPlaying ? <Music size={20} /> : <VolumeX size={20} />}
       </button>
 
-      {/*Free Classical Music */}
-      <audio
-        ref={audioRef}
-        loop
-        src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" 
-      />
+      {/* Audiomack background music */}
+      {isPlaying && (
+        <iframe
+          src="https://audiomack.com/embed/song/donbenny/ore-ofe-sha-live?background=1&autoplay=1"
+          scrolling="no"
+          width="1px"
+          height="1px"
+          scrollbars="no"
+          frameBorder="0"
+          allow="autoplay"
+          className="absolute pointer-events-none opacity-0"
+          title="Background Music"
+        ></iframe>
+      )}
 
       <motion.main 
         className="flex-grow pt-24"

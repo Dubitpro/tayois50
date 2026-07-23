@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <button id="toggle">Toggle Music</button>
+  <div id="container"></div>
+  <script>
+    let playing = false;
+    document.getElementById('toggle').addEventListener('click', () => {
+      playing = !playing;
+      const container = document.getElementById('container');
+      if (playing) {
+        container.innerHTML = '<iframe src="https://audiomack.com/embed/song/donbenny/ore-ofe-sha-live?background=1&autoplay=1" allow="autoplay" style="display:none;"></iframe>';
+      } else {
+        container.innerHTML = '';
+      }
+    });
+  </script>
+</body>
+</html>

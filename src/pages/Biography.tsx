@@ -54,10 +54,10 @@ export default function Biography() {
             >
               <h2 className="font-cormorant text-4xl text-elegant-black">A Visionary Leader</h2>
               <p className="font-sans text-elegant-black/80 leading-relaxed text-lg">
-                For half a century, She has been a beacon of hope and a symbol of unwavering elegance. Through visionary leadership and a profound commitment to humanity, she has transformed the landscape of global philanthropy and business.
+                Dr. Omotayo Oluseyi Osinaike, born in Lagos in 1976, grew up between Lagos and Ode Omu, shaped by strong family values, spiritual guidance, and disciplined academic foundations. Her faith deepened during her time at Federal Government Girls College, Akure, becoming the anchor for her identity. She pursued medicine at the University of Ibadan/UCH, a journey that strengthened her resilience. During this period, she married Ademola Osinaike and began building her family, welcoming three children between 2006 and 2015.
               </p>
-              <p className="font-sans text-elegant-black/80 leading-relaxed text-lg">
-                Her legacy is not merely defined by titles, but by the countless lives touched through her foundations, her pioneering spirit in entrepreneurship, and her timeless grace that continues to inspire generations.
+              <p className="font-sans text-elegant-black/80 leading-relaxed text-lg mt-4">
+                Her career progressed from medical officer roles into Radiology, culminating in her Fellowship of the West African College of Surgeons in 2017. She served as Consultant Radiologist and Head of Department at General Hospital Gbagada before relocating to the UAE in 2021, where she continues to practice through Accuread Radiology Nigeria Ltd. Active in church communities and mentoring young women, she now integrates her clinical expertise with medical approval and utilization management, exemplifying excellence, compassion, and purpose.
               </p>
             </motion.div>
           </div>

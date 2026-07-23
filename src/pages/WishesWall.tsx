@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 import { Quote, Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { collection, getDocs, doc, updateDoc, increment, query, orderBy } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../firebase/config';
 
@@ -135,9 +136,15 @@ export default function WishesWall() {
           <div className="text-center mb-20">
             <h1 className="font-cormorant text-5xl md:text-7xl text-elegant-black mb-6">Wishes from the World</h1>
             <div className="w-24 h-[2px] bg-luxury-gold mx-auto mb-8"></div>
-            <p className="font-serif text-xl italic text-elegant-black/70 max-w-2xl mx-auto">
+            <p className="font-serif text-xl italic text-elegant-black/70 max-w-2xl mx-auto mb-8">
               Heartfelt messages from family, friends & admirers across the globe
             </p>
+            <Link 
+              to="/guestbook" 
+              className="inline-block bg-luxury-gold text-white font-sans text-xs uppercase tracking-widest px-8 py-3 hover:bg-elegant-black transition-colors"
+            >
+              Click here to Drop A Wish
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

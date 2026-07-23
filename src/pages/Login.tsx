@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { auth, isFirebaseConfigured } from '../firebase/config';
 import { useNavigate } from 'react-router-dom';
 import { Crown, Loader2 } from 'lucide-react';
 import SEO from '../components/SEO';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -11,16 +12,22 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { mockLogin } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     // For preview environments without Firebase Config
-    if (import.meta.env.VITE_FIREBASE_API_KEY === undefined) {
+    if (!isFirebaseConfigured) {
       setTimeout(() => {
-        setError('Firebase is not configured. This is a preview environment.');
+        if (email === 'admin@palace.com' && password === 'admin') {
+          if (mockLogin) mockLogin();
+          navigate('/admin');
+        } else {
+          setError('Invalid credentials. For preview environment, use Email: admin@palace.com and Passcode: admin');
+        }
         setLoading(false);
       }, 1000);
       return;

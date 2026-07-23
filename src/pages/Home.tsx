@@ -160,7 +160,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="font-sans text-sm md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4 whitespace-pre-line"
+            className="font-sans text-sm md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4 whitespace-pre-line md:whitespace-normal"
           >
             {config?.heroTitleTop || "Celebrating 50 \n Glorious Years"}
           </motion.h2>

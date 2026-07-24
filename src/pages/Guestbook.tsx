@@ -25,7 +25,7 @@ interface GuestbookEntry {
   likes?: number;
 }
 
-const withTimeout = <T,>(promise: Promise<T>, ms: number = 3000): Promise<T> => {
+const withTimeout = <T,>(promise: Promise<T>, ms: number = 10000): Promise<T> => {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Firebase operation timed out')), ms))
@@ -48,46 +48,14 @@ export default function Guestbook() {
 
   const fetchEntries = async () => {
     try {
-      // First try to fetch from Firebase
       if (isFirebaseConfigured) {
-        try {
-          const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
-          const querySnapshot = await withTimeout(getDocs(q));
-          const data: GuestbookEntry[] = [];
-          querySnapshot.forEach((doc) => {
-            data.push({ id: doc.id, ...doc.data() } as GuestbookEntry);
-          });
-          
-          if (data.length > 0) {
-            setEntries(data);
-            return;
-          }
-        } catch (fbError) {
-          console.warn("Firebase fetch failed", fbError);
-        }
-      }
-
-      // Fallback to local API for development if Firebase is not configured
-      try {
-        const response = await fetch('/api/wishes');
-        if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-          const data = await response.json();
-          setEntries(data);
-          return;
-        }
-      } catch (apiError) {
-        console.warn("API fetch failed", apiError);
-      }
-
-      // Fallback to localStorage for Netlify without Firebase
-      const localWishes = localStorage.getItem('wishes');
-      if (localWishes) {
-        setEntries(JSON.parse(localWishes));
-      } else {
-        // Default mock data
-        setEntries([
-          { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", createdAt: new Date().toISOString(), likes: 0 }
-        ]);
+        const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const data = [];
+        querySnapshot.forEach((doc) => {
+          data.push({ id: doc.id, ...doc.data() });
+        });
+        setEntries(data);
       }
     } catch (error) {
       console.error("Error fetching guestbook entries:", error);
@@ -99,70 +67,25 @@ export default function Guestbook() {
     setSubmitError(null);
     setSubmitSuccess(false);
 
-    const newWish = {
-      ...data,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      likes: 0
-    };
-
-    let isSaved = false;
-
-    if (isFirebaseConfigured) {
-      try {
-        // Try Firebase first
-        await withTimeout(addDoc(collection(db, 'wishes'), {
+    try {
+      if (isFirebaseConfigured) {
+        await addDoc(collection(db, 'wishes'), {
           ...data,
           createdAt: serverTimestamp(),
           likes: 0
-        }));
-        isSaved = true;
-      } catch (fbError) {
-        console.warn("Firebase save failed", fbError);
-      }
-    }
-
-    if (!isSaved) {
-      try {
-        // Fallback to local API
-        const response = await fetch('/api/wishes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
         });
-        
-        if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-          isSaved = true;
-        }
-      } catch (apiError) {
-        console.warn("API save failed", apiError);
+        setSubmitSuccess(true);
+        reset();
+        fetchEntries();
+      } else {
+        throw new Error("Firebase is not configured.");
       }
-    }
-
-    if (!isSaved) {
-      // Fallback to localStorage (Netlify no backend)
-      try {
-        const localWishes = localStorage.getItem('wishes');
-        const parsedWishes = localWishes ? JSON.parse(localWishes) : [
-          { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", createdAt: new Date().toISOString(), likes: 0 }
-        ];
-        parsedWishes.unshift(newWish);
-        localStorage.setItem('wishes', JSON.stringify(parsedWishes));
-        isSaved = true;
-      } catch (storageError) {
-        console.warn("LocalStorage save failed", storageError);
-      }
-    }
-
-    if (isSaved) {
-      setSubmitSuccess(true);
-      reset();
-      fetchEntries();
-    } else {
+    } catch (error) {
+      console.error("Error submitting guestbook entry:", error);
       setSubmitError("Failed to sign the guestbook. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsSubmitting(false);
   };
 
   return (

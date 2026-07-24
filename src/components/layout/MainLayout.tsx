@@ -61,7 +61,7 @@ export default function MainLayout() {
         className="fixed bottom-8 right-8 z-50 w-12 h-12 bg-elegant-black/80 backdrop-blur-md border border-luxury-gold/50 rounded-full flex items-center justify-center text-luxury-gold hover:bg-luxury-gold hover:text-elegant-black transition-all duration-300 shadow-lg"
         aria-label="Toggle Background Music"
       >
-        {isPlaying ? <Music size={20} /> : <VolumeX size={20} />}
+        {isPlaying ? <VolumeX size={20} /> : <Music size={20} />}
       </button>
 
       {/* Audiomack background music */}

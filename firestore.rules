@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitives
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidWish(data) {
+      return data.keys().hasAll(['name', 'country', 'message', 'createdAt', 'likes']) &&
+             data.keys().size() == 5 &&
+             data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+             data.country is string && data.country.size() >= 2 && data.country.size() <= 100 &&
+             data.message is string && data.message.size() >= 10 && data.message.size() <= 1000 &&
+             data.createdAt is timestamp &&
+             data.likes is number && data.likes == 0;
+    }
+
+    match /wishes/{wishId} {
+      // Allow anybody to read all wishes (Public Guestbook)
+      allow read: if true;
+
+      // Allow anybody to create a wish if it strictly matches schema
+      allow create: if isValidId(wishId) && isValidWish(incoming()) && incoming().createdAt == request.time;
+
+      // Allow anybody to increment likes by 1, but nothing else
+      allow update: if isValidId(wishId) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['likes']) &&
+        incoming().likes == existing().likes + 1
+      );
+      
+      allow delete: if false; // Nobody can delete
+    }
+  }
+}

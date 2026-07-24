@@ -45,10 +45,20 @@ export default function Home() {
   // Hero Images State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const heroImages = [
-    "https://i.pinimg.com/736x/77/ad/26/77ad26768f809a4206f189ed9bbe7799.jpg",
-    "https://i.pinimg.com/736x/74/40/da/7440da71cf7f8fe433f39e62977c8f5a.jpg",
-    "https://i.pinimg.com/736x/f1/e1/12/f1e112e87f4f46e64423d088fc0d1c8f.jpg"
+    "/1.jpg",
+    "/2.jpg",
+    "/3.jpg",
+    "/4.jpg"
   ];
+  
+  // Preload hero images for seamless transitions
+  useEffect(() => {
+    heroImages.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   const heroCaptions = config?.heroCaptions || [
     "A life beautified by God’s mercy",
     "Vessel of divine brilliance",
@@ -122,10 +132,12 @@ export default function Home() {
           {/* Mobile Hero Image (Static) */}
           <div className="absolute inset-0 w-full h-full md:hidden">
             <img 
-              src="https://i.pinimg.com/736x/4b/62/ca/4b62caa88760bc422fa59197ed1fb1d8.jpg" 
+              src="/1.jpg" 
               alt="Portrait Mobile" 
               className="absolute inset-0 w-full h-full object-cover object-[center_top]"
               referrerPolicy="no-referrer"
+              fetchPriority="high"
+              decoding="async"
             />
           </div>
 
@@ -148,19 +160,21 @@ export default function Home() {
                   alt="Portrait" 
                   className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
                   referrerPolicy="no-referrer"
+                  fetchPriority="high"
+                  decoding="async"
                 />
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
 
-        <div className="container relative z-20 mx-auto px-6 text-left text-pearl-white -translate-y-8 md:translate-y-0">
+        <div className="container relative z-20 mx-auto px-6 text-left text-pearl-white translate-y-16 md:translate-y-0">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="font-sans text-sm md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4 whitespace-pre-line md:whitespace-normal"
+            className="font-sans text-xs md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4 whitespace-pre-line md:whitespace-normal"
           >
             {config?.heroTitleTop || "Celebrating 50 \n Glorious Years"}
           </motion.h2>
@@ -170,7 +184,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 1, delay: 0.6 }}
-            className="font-cormorant text-6xl md:text-8xl lg:text-9xl font-medium mb-6 drop-shadow-lg"
+            className="font-cormorant text-5xl md:text-7xl lg:text-8xl font-medium mb-6 drop-shadow-lg"
           >
             {config?.heroTitleMain || "Golden Jubilee"}
           </motion.h1>
@@ -183,7 +197,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.8 }}
-                className="font-serif text-base md:text-2xl font-light italic text-pearl-white/90"
+                className="font-serif text-sm md:text-2xl font-light italic text-pearl-white/90"
               >
                 {heroCaptions[currentImageIndex]}
               </motion.p>
@@ -209,11 +223,11 @@ export default function Home() {
 
             <Link 
               to="/guestbook" 
-              className="mt-6 inline-flex items-center justify-center gap-3 bg-luxury-gold text-elegant-black hover:bg-white transition-all duration-500 px-8 py-5 md:px-10 md:py-6 rounded shadow-[0_0_20px_rgba(212,175,55,0.4)] w-full sm:w-auto"
+              className="mt-6 inline-flex items-center justify-start gap-2 bg-luxury-gold text-elegant-black hover:bg-white transition-all duration-500 px-6 py-3 md:px-8 md:py-4 rounded shadow-[0_0_20px_rgba(212,175,55,0.4)] w-full sm:w-auto self-start"
             >
-              <PenTool className="w-6 h-6 md:w-8 md:h-8" />
-              <span className="font-sans text-base md:text-xl font-bold uppercase tracking-[0.1em]">
-                Drop a Congratulatory Message
+              <PenTool className="w-4 h-4 md:w-5 md:h-5" />
+              <span className="font-sans text-xs md:text-sm font-bold uppercase tracking-[0.1em]">
+                Drop a Wish
               </span>
             </Link>
           </motion.div>
@@ -235,9 +249,6 @@ export default function Home() {
             "To live a life of purpose is to leave a legacy of love, compassion, and unwavering strength."
           </h3>
           <div className="w-16 h-[2px] bg-luxury-gold mx-auto mb-6"></div>
-          <p className="font-sans uppercase tracking-widest text-sm text-elegant-black/60 mb-8">
-            The Queen
-          </p>
           <div className="flex justify-center opacity-80">
             <svg width="250" height="80" viewBox="0 0 250 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform scale-125">
               <motion.path 
@@ -386,15 +397,6 @@ export default function Home() {
       </section>
 
       {/* Floating CTA for Elder Users */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-sm pointer-events-auto shadow-2xl">
-        <Link 
-          to="/guestbook"
-          className="flex items-center justify-center gap-3 bg-luxury-gold text-elegant-black hover:bg-white transition-all duration-300 py-4 px-6 rounded-full font-sans font-bold text-base md:text-lg uppercase tracking-wider text-center border-2 border-transparent hover:border-luxury-gold"
-        >
-          <PenTool className="w-6 h-6 shrink-0" />
-          <span>Drop a Message</span>
-        </Link>
-      </div>
     </>
   );
 }

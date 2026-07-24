@@ -4,15 +4,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const defaultImages = [
-  "https://i.pinimg.com/736x/5b/fe/d7/5bfed7298601ac9c981fd5cb03a46fa5.jpg",
-  "https://i.pinimg.com/736x/f6/3a/a3/f63aa3c3206dfd2baf03eb4782110437.jpg",
-  "https://i.pinimg.com/736x/34/d0/fb/34d0fb4b34acbdb6bb12783d90cf52bf.jpg",
-  "https://i.pinimg.com/736x/18/33/4d/18334d4c223e87552566d28216d713c1.jpg",
-  "https://i.pinimg.com/736x/58/ea/81/58ea81c3aa505de6b5fd63e2a408b56f.jpg",
-  "https://i.pinimg.com/736x/f2/9e/12/f29e12626f56a6378a98fb6c2b8fb04f.jpg",
-  "https://i.pinimg.com/736x/1f/9d/99/1f9d9970b2625b05ce20e5f7010c2bf8.jpg",
-  "https://i.pinimg.com/736x/ed/bc/cc/edbccc2010e98c50d5cc013e7f7ad146.jpg",
-  "https://i.pinimg.com/736x/1d/50/60/1d50608f161ad14553b1bd4c7dd7abd3.jpg",
+  "/6.jpg",
+  "/osinaike-1.jpg",
+  "/osinaike-10.jpg",
+  "/osinaike-2.jpg",
+  "/osinaike-2b.jpg",
+  "/osinaike-3c2.jpg",
+  "/osinaike-4.jpg",
+  "/osinaike-5b.jpg",
+  "/osinaike-6.jpg",
+  "/osinaike-7.jpg",
+  "/osinaike-7c.jpg",
+  "/osinaike-8b2.jpg",
+  "/osinaike-8d4.jpg",
+  "/osinaike-9.jpg"
 ];
 
 export default function Gallery() {
@@ -25,7 +30,10 @@ export default function Gallery() {
       .then(res => res.json())
       .then(data => {
         if (data.galleryImages && data.galleryImages.length > 0) {
-          setImages(data.galleryImages);
+          const filteredImages = data.galleryImages.filter((img: string) => 
+            !["/1.jpg", "/2.jpg", "/3.jpg", "/4.jpg"].includes(img)
+          );
+          setImages(filteredImages.length > 0 ? filteredImages : defaultImages);
         }
       })
       .catch(console.error);
@@ -65,6 +73,8 @@ export default function Gallery() {
                   src={src} 
                   alt={`Memory ${index + 1}`} 
                   className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                  loading="lazy"
+                  decoding="async"
                 />
               </motion.div>
             ))}

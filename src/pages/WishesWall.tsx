@@ -5,6 +5,7 @@ import { Quote, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { collection, getDocs, doc, updateDoc, increment, query, orderBy } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../firebase/config';
+import ShareWidget from '../components/ShareWidget';
 
 interface Wish {
   id: string;
@@ -63,7 +64,12 @@ export default function WishesWall() {
         } else {
           // Default mock data
           setWishes([
-            { id: '1', name: "King Charles", country: "United Kingdom", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee.", likes: 0 }
+            { id: '1', name: "Oluwaseun Adeyemi", country: "Nigeria", message: "A truly magnificent milestone for an extraordinary leader. Happy Golden Jubilee! Your wisdom and grace continue to inspire us all.", likes: 12 },
+            { id: '2', name: "Sarah Jenkins", country: "United Kingdom", message: "Wishing you an unforgettable 50th birthday surrounded by those you love. Here’s to many more years of joy and prosperity.", likes: 5 },
+            { id: '3', name: "David Osei", country: "Ghana", message: "Fifty years of excellence and counting. May this special day bring you immense happiness and peace.", likes: 8 },
+            { id: '4', name: "Elena Rodriguez", country: "Spain", message: "Feliz cumpleaños! Thank you for the incredible impact you have made over the last five decades. Enjoy your celebration.", likes: 3 },
+            { id: '5', name: "Michael Chang", country: "Canada", message: "A golden milestone for a heart of gold. Wishing you the happiest of birthdays and a wonderful year ahead.", likes: 20 },
+            { id: '6', name: "Amina Bello", country: "Nigeria", message: "Your journey so far has been nothing short of inspiring. Cheers to 50 years of greatness and a future filled with even more blessings.", likes: 15 }
           ]);
         }
       } catch (error) {
@@ -184,6 +190,7 @@ export default function WishesWall() {
 
         </div>
       </div>
+      <ShareWidget />
     </>
   );
 }

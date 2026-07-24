@@ -1,0 +1,23 @@
+{
+  "entities": {
+    "Wish": {
+      "title": "Wish",
+      "description": "A guestbook entry or wish",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "country": { "type": "string", "maxLength": 100 },
+        "message": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string" },
+        "likes": { "type": "number" }
+      },
+      "required": ["name", "country", "message", "createdAt", "likes"]
+    }
+  },
+  "firestore": {
+    "wishes/{wishId}": {
+      "schema": { "$ref": "#/entities/Wish" },
+      "description": "The collection of wishes"
+    }
+  }
+}

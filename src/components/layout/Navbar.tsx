@@ -41,7 +41,7 @@ export default function Navbar() {
           <Crown className={cn("w-8 h-8 transition-colors duration-300", needsBackground ? "text-luxury-gold" : "text-luxury-gold md:text-pearl-white")} />
           <span className={cn(
             "font-cormorant text-2xl font-bold tracking-widest transition-colors duration-300 lowercase",
-            needsBackground ? "text-elegant-black" : "text-elegant-black md:text-pearl-white"
+            needsBackground ? "text-elegant-black" : "text-pearl-white"
           )}>
             tayois50
           </span>

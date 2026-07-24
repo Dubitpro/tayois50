@@ -38,11 +38,12 @@ export default function Biography() {
             >
               <div className="relative p-4 border-2 border-luxury-gold">
                 <img 
-                  src="/6.jpg" 
+                  src="https://i.pinimg.com/736x/3d/d3/c2/3dd3c2f1bfbb73aeacd85704d505e69e.jpg" 
                   alt="Portrait" 
                   className="w-full h-auto object-cover grayscale hover:grayscale-0 transition-all duration-1000"
                   loading="lazy"
                   decoding="async"
+                  referrerPolicy="no-referrer"
                 />
               </div>
             </motion.div>

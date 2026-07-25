@@ -3,7 +3,7 @@ import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 import { Quote, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { collection, getDocs, doc, updateDoc, increment, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, increment, query, orderBy } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../firebase/config';
 import ShareWidget from '../components/ShareWidget';
 
@@ -26,22 +26,22 @@ export default function WishesWall() {
   const [wishes, setWishes] = useState<Wish[]>([]);
 
   useEffect(() => {
-    const fetchWishes = async () => {
-      try {
-        if (isFirebaseConfigured) {
-          const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
-          const querySnapshot = await getDocs(q);
-          const data = [];
-          querySnapshot.forEach((doc) => {
-            data.push({ id: doc.id, ...doc.data() });
-          });
-          setWishes(data);
-        }
-      } catch (error) {
+    let unsubscribe: () => void;
+    if (isFirebaseConfigured) {
+      const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        const data: Wish[] = [];
+        snapshot.forEach((doc) => {
+          data.push({ id: doc.id, ...doc.data() } as Wish);
+        });
+        setWishes(data);
+      }, (error) => {
         console.error("Error fetching wishes:", error);
-      }
+      });
+    }
+    return () => {
+      if (unsubscribe) unsubscribe();
     };
-    fetchWishes();
   }, []);
 
   const handleLike = async (id: string) => {

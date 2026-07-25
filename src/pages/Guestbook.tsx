@@ -5,13 +5,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PenTool, Loader2 } from 'lucide-react';
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../firebase/config';
 
 const guestbookSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters."),
-  country: z.string().min(2, "Country is required."),
-  message: z.string().min(10, "Message must be at least 10 characters.")
+  name: z.string().min(2, "Name must be at least 2 characters.").max(100, "Name is too long."),
+  country: z.string().min(2, "Country is required.").max(100, "Country is too long."),
+  message: z.string().min(10, "Message must be at least 10 characters.").max(1000, "Message is too long.")
 });
 
 type GuestbookForm = z.infer<typeof guestbookSchema>;
@@ -43,24 +43,23 @@ export default function Guestbook() {
   });
 
   useEffect(() => {
-    fetchEntries();
-  }, []);
-
-  const fetchEntries = async () => {
-    try {
-      if (isFirebaseConfigured) {
-        const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const data = [];
-        querySnapshot.forEach((doc) => {
-          data.push({ id: doc.id, ...doc.data() });
+    let unsubscribe: () => void;
+    if (isFirebaseConfigured) {
+      const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        const data: GuestbookEntry[] = [];
+        snapshot.forEach((doc) => {
+          data.push({ id: doc.id, ...doc.data() } as GuestbookEntry);
         });
         setEntries(data);
-      }
-    } catch (error) {
-      console.error("Error fetching guestbook entries:", error);
+      }, (error) => {
+        console.error("Error fetching guestbook entries:", error);
+      });
     }
-  };
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
 
   const onSubmit = async (data: GuestbookForm) => {
     setIsSubmitting(true);
@@ -69,14 +68,14 @@ export default function Guestbook() {
 
     try {
       if (isFirebaseConfigured) {
-        await addDoc(collection(db, 'wishes'), {
+        await withTimeout(addDoc(collection(db, 'wishes'), {
           ...data,
           createdAt: serverTimestamp(),
           likes: 0
-        });
+        }), 10000);
+        
         setSubmitSuccess(true);
         reset();
-        fetchEntries();
       } else {
         throw new Error("Firebase is not configured.");
       }

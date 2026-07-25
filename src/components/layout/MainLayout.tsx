@@ -7,15 +7,7 @@ import { Crown, Music, VolumeX } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 export default function MainLayout() {
-  const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const toggleMusic = () => {
     setIsPlaying(!isPlaying);
@@ -23,31 +15,6 @@ export default function MainLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-soft-ivory relative">
-      <AnimatePresence>
-        {loading && (
-          <motion.div
-            key="curtain"
-            initial={{ y: 0 }}
-            exit={{ y: '-100%' }}
-            transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
-            className="fixed inset-0 z-[100] bg-elegant-black flex flex-col items-center justify-center border-b-[12px] border-luxury-gold"
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1, delay: 0.2 }}
-              className="text-center flex flex-col items-center"
-            >
-              <Crown className="w-20 h-20 text-luxury-gold mx-auto mb-6" />
-              <h1 className="font-cormorant text-4xl md:text-6xl text-luxury-gold tracking-widest uppercase">
-                TAYO IS 50
-              </h1>
-              <div className="mt-8 mb-12 w-px h-16 bg-gradient-to-b from-luxury-gold to-transparent mx-auto"></div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <Navbar />
 
       {/* Floating Music Controller */}
@@ -79,7 +46,7 @@ export default function MainLayout() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: loading ? 2.5 : 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0 }}
       >
         <Outlet />
       </motion.main>

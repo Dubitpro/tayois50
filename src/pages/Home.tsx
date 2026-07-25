@@ -3,23 +3,19 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import SEO from '../components/SEO';
 import { ChevronDown, Sparkles, Clock, PenTool, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { cn } from '../lib/utils';
 
 const calculateTimeLeft = (targetDate: string = "2026-08-09T00:00:00") => {
   const difference = +new Date(targetDate) - +new Date();
-  let timeLeft = {
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  };
+  let timeLeft: { [key: string]: number } = {};
 
   if (difference > 0) {
     timeLeft = {
-      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((difference / 1000 / 60) % 60),
-      seconds: Math.floor((difference / 1000) % 60)
+      Days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      Hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
     };
+  } else {
+    timeLeft = { Days: 0, Hours: 0 };
   }
 
   return timeLeft;
@@ -50,10 +46,17 @@ export default function Home() {
     "https://i.pinimg.com/originals/73/ec/4a/73ec4a429e49beed3817641432a00c3a.jpg",
     "https://i.pinimg.com/originals/3e/a4/8c/3ea48cf9823f9e95a18c1787fa955f38.jpg"
   ];
+
+  const mobileHeroImages = [
+    "https://i.pinimg.com/736x/b9/f0/38/b9f038fd9134e960488ba976fb172a92.jpg",
+    "https://i.pinimg.com/736x/49/49/11/4949114018c15a5e6fa2067e94e266a1.jpg",
+    "https://i.pinimg.com/736x/68/9f/53/689f531d57dd0f4630e5ad26fbfc5b9c.jpg",
+    "https://i.pinimg.com/736x/6a/3b/55/6a3b55253d419f3f3b08ea9c1bd731ec.jpg"
+  ];
   
   // Preload hero images for seamless transitions
   useEffect(() => {
-    heroImages.forEach((src) => {
+    [...heroImages, ...mobileHeroImages].forEach((src) => {
       const img = new Image();
       img.src = src;
     });
@@ -85,7 +88,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
-    }, 10000);
+    }, 12000);
     return () => clearInterval(interval);
   }, []);
 
@@ -129,6 +132,32 @@ export default function Home() {
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-black/40 z-10" />
           
+          {/* Mobile Hero Images (Slideshow) */}
+          <div className="absolute inset-0 w-full h-full md:hidden landscape:hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentImageIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.5, ease: "easeInOut" }}
+                className="absolute inset-0 w-full h-full"
+              >
+                <motion.img 
+                  initial={{ scale: 1.05 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                  src={mobileHeroImages[currentImageIndex]} 
+                  alt="Portrait Mobile" 
+                  className="absolute inset-0 w-full h-full object-cover object-[center_top]"
+                  referrerPolicy="no-referrer"
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
           {/* Desktop & Landscape Hero Images (Slideshow) */}
           <div className="absolute inset-0 w-full h-full hidden md:block landscape:block">
             <AnimatePresence mode="wait">
@@ -156,15 +185,16 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="container relative z-20 mx-auto px-6 text-center md:text-left text-pearl-white translate-y-16 md:translate-y-0">
+        <div className="container relative z-20 mx-auto px-6 text-center md:text-left text-pearl-white translate-y-24 md:translate-y-0">
+          
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="font-sans text-xs md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4 whitespace-pre-line md:whitespace-normal mx-auto md:mx-0"
+            className="font-sans text-xs md:text-lg tracking-[0.3em] uppercase text-luxury-gold mb-4 whitespace-nowrap mx-auto md:mx-0"
           >
-            {config?.heroTitleTop || "Celebrating 50 \n Glorious Years"}
+            {config?.heroTitleTop || "Celebrating 50 Glorious Years"}
           </motion.h2>
           
           <motion.h1 
@@ -184,13 +214,31 @@ export default function Home() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.5 }}
                 className="font-serif text-sm md:text-2xl font-light italic text-pearl-white/90"
               >
                 {heroCaptions[currentImageIndex]}
               </motion.p>
             </AnimatePresence>
           </div>
+
+          {/* Desktop Countdown (Small, no frame, below text) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 1, delay: 0.9 }}
+            className="hidden md:flex justify-start w-full max-w-xl mx-0 mb-6"
+          >
+            <div className="flex gap-6">
+              {Object.entries(timeLeft).map(([unit, value]) => (
+                <div key={unit} className="flex flex-col items-center px-1">
+                  <span className="font-cormorant text-2xl text-luxury-gold">{value.toString().padStart(2, '0')}</span>
+                  <span className="font-sans text-[9px] uppercase tracking-widest text-pearl-white/70 mt-1">{unit}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -199,19 +247,9 @@ export default function Home() {
             transition={{ duration: 1, delay: 1.2 }}
             className="flex flex-col items-center md:items-start gap-2 md:gap-5"
           >
-            {/* Countdown */}
-            <div className="flex gap-2 md:gap-6 justify-center md:justify-start border-y border-luxury-gold/30 py-2 md:py-3 w-full max-w-xl backdrop-blur-sm bg-elegant-black/20 mx-auto md:mx-0">
-              {Object.entries(timeLeft).map(([unit, value], idx) => (
-                <div key={unit} className="flex flex-col items-center px-2 md:px-4">
-                  <span className="font-cormorant text-xl md:text-4xl text-luxury-gold">{value.toString().padStart(2, '0')}</span>
-                  <span className="font-sans text-[8px] md:text-[10px] uppercase tracking-widest text-pearl-white/70 mt-1">{unit}</span>
-                </div>
-              ))}
-            </div>
-
             <Link 
               to="/guestbook" 
-              className="mt-6 inline-flex items-center justify-center md:justify-start gap-2 bg-luxury-gold text-elegant-black hover:bg-white transition-all duration-500 px-6 py-3 md:px-8 md:py-4 rounded shadow-[0_0_20px_rgba(212,175,55,0.4)] w-full sm:w-auto self-center md:self-start mx-auto md:mx-0"
+              className="mt-2 md:mt-0 inline-flex items-center justify-center md:justify-start gap-2 bg-luxury-gold text-elegant-black hover:bg-white transition-all duration-500 px-6 py-3 md:px-8 md:py-4 rounded shadow-[0_0_20px_rgba(212,175,55,0.4)] w-full sm:w-auto self-center md:self-start mx-auto md:mx-0"
             >
               <PenTool className="w-4 h-4 md:w-5 md:h-5" />
               <span className="font-sans text-xs md:text-sm font-bold uppercase tracking-[0.1em]">
@@ -270,10 +308,9 @@ export default function Home() {
       {/* Highlights / Features */}
       <section className="py-24 bg-pearl-white border-t border-b border-luxury-gold/20">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {[
-              { title: "The Legacy", desc: "Explore fifty years of outstanding achievements and global impact.", link: "/biography" },
-              { title: "Gallery", desc: "A curated collection of unforgettable moments in time.", link: "/gallery" },
+              { title: "A Journey Through Time", desc: "A curated collection of unforgettable moments in time.", link: "/gallery" },
               { title: "Wishes Wall", desc: "Read heartfelt messages from dignitaries and citizens worldwide.", link: "/wishes" }
             ].map((item, idx) => (
               <motion.div 
@@ -301,7 +338,7 @@ export default function Home() {
         <div className="container mx-auto px-6 max-w-4xl">
           <div className="text-center mb-16">
             <PenTool className="w-8 h-8 text-luxury-gold mx-auto mb-6" />
-            <h2 className="font-cormorant text-4xl md:text-5xl text-elegant-black mb-6">Draft a Tribute</h2>
+            <h2 className="font-cormorant text-4xl md:text-5xl text-elegant-black mb-6">Heartfelt Wishes</h2>
             <div className="w-16 h-[2px] bg-luxury-gold mx-auto mb-6"></div>
             <p className="font-serif italic text-elegant-black/70 text-lg">
               Allow our scribes (AI) to craft a beautifully articulated message on your behalf.
@@ -354,7 +391,7 @@ export default function Home() {
                   disabled={aiGenerating}
                   className="inline-flex items-center justify-center gap-2 bg-elegant-black text-luxury-gold px-12 py-4 font-sans text-sm uppercase tracking-widest hover:bg-elegant-black/90 transition-colors disabled:opacity-70"
                 >
-                  {aiGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Draft Tribute"}
+                  {aiGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Heartfelt Wishes"}
                 </button>
               </div>
             </form>

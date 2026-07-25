@@ -12,9 +12,25 @@ const navLinks = [
   { title: 'Message of Love', path: '/guestbook' },
 ];
 
+const calculateTimeLeft = (targetDate: string = "2026-08-09T00:00:00") => {
+  const difference = +new Date(targetDate) - +new Date();
+  let timeLeft: { [key: string]: number } = {};
+
+  if (difference > 0) {
+    timeLeft = {
+      Days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      Hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    };
+  } else {
+    timeLeft = { Days: 0, Hours: 0 };
+  }
+  return timeLeft;
+};
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
   const location = useLocation();
   const isHome = location.pathname === '/';
 
@@ -28,24 +44,41 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+    return () => clearTimeout(timer);
+  });
+
   // On non-home pages, we might always want a background so text is readable
   const needsBackground = !isHome || isScrolled;
 
   return (
     <header className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-      needsBackground ? "bg-soft-ivory shadow-md border-b border-luxury-gold/10 py-4" : "bg-transparent py-6"
+      needsBackground ? "bg-soft-ivory shadow-md border-b border-luxury-gold/10 py-4" : "bg-transparent py-4 md:py-6"
     )}>
-      <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
-        <Link to="/" className="flex items-center gap-3 group">
-          <Crown className={cn("w-8 h-8 transition-colors duration-300", needsBackground ? "text-luxury-gold" : "text-luxury-gold md:text-pearl-white")} />
+      <div className="container mx-auto px-4 md:px-12 flex justify-between items-center">
+        <Link to="/" className="flex items-center gap-2 md:gap-3 group">
+          <Crown className={cn("w-6 h-6 md:w-8 md:h-8 transition-colors duration-300", needsBackground ? "text-luxury-gold" : "text-luxury-gold md:text-pearl-white")} />
           <span className={cn(
-            "font-cormorant text-2xl font-bold tracking-widest transition-colors duration-300",
+            "font-cormorant text-xl md:text-2xl font-bold tracking-widest transition-colors duration-300",
             needsBackground ? "text-elegant-black" : "text-pearl-white"
           )}>
             TAYOIS50
           </span>
         </Link>
+
+        {/* Mobile Countdown (Only Days and Hours) */}
+        <div className="md:hidden flex items-center gap-2 md:gap-3 ml-auto mr-4">
+          {Object.entries(timeLeft).map(([unit, value]) => (
+            <div key={unit} className="flex flex-col items-center">
+              <span className={cn("font-cormorant text-base leading-none font-semibold", needsBackground ? "text-elegant-black" : "text-pearl-white")}>{value.toString().padStart(2, '0')}</span>
+              <span className={cn("font-sans text-[8px] uppercase tracking-wider mt-0.5", needsBackground ? "text-elegant-black/70" : "text-pearl-white/70")}>{unit}</span>
+            </div>
+          ))}
+        </div>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">

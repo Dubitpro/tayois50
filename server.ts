@@ -37,7 +37,7 @@ async function startServer() {
   } catch {
     await fs.writeFile(CONFIG_FILE, JSON.stringify({
       countdownDate: "2026-08-09T00:00:00",
-      heroTitleTop: "Celebrating 50 \n Glorious Years",
+      heroTitleTop: "Celebrating 50 Glorious Years",
       heroTitleMain: "Golden Jubilee",
       heroCaptions: [
         "A life beautified by God’s mercy",

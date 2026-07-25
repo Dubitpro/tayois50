@@ -1,69 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import SEO from '../components/SEO';
-import { motion } from 'framer-motion';
-import { Quote, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { collection, onSnapshot, doc, updateDoc, increment, query, orderBy } from 'firebase/firestore';
-import { db, isFirebaseConfigured } from '../firebase/config';
 import ShareWidget from '../components/ShareWidget';
-
-interface Wish {
-  id: string;
-  name: string;
-  country: string;
-  message: string;
-  likes?: number;
-}
-
-const withTimeout = <T,>(promise: Promise<T>, ms: number = 10000): Promise<T> => {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Firebase operation timed out')), ms))
-  ]);
-};
+import { useGuestbook } from '../hooks/useGuestbook';
+import WishCard from '../components/guestbook/WishCard';
 
 export default function WishesWall() {
-  const [wishes, setWishes] = useState<Wish[]>([]);
-
-  useEffect(() => {
-    let unsubscribe: () => void;
-    if (isFirebaseConfigured) {
-      const q = query(collection(db, 'wishes'), orderBy('createdAt', 'desc'));
-      unsubscribe = onSnapshot(q, (snapshot) => {
-        const data: Wish[] = [];
-        snapshot.forEach((doc) => {
-          data.push({ id: doc.id, ...doc.data() } as Wish);
-        });
-        setWishes(data);
-      }, (error) => {
-        console.error("Error fetching wishes:", error);
-      });
-    }
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, []);
-
-  const handleLike = async (id: string) => {
-    try {
-      if (isFirebaseConfigured) {
-        const wishRef = doc(db, 'wishes', id);
-        await updateDoc(wishRef, {
-          likes: increment(1)
-        });
-        setWishes(wishes.map(w => w.id === id ? { ...w, likes: (w.likes || 0) + 1 } : w));
-      }
-    } catch (error) {
-      console.error("Error liking wish:", error);
-    }
-  };
+  const { wishes, loading, error, handleLike } = useGuestbook();
 
   return (
     <>
       <SEO title="Wishes Wall" description="Heartfelt messages from family, friends & admirers across the globe" />
-        
       
-
       <div className="bg-soft-ivory py-24 min-h-screen">
         <div className="container mx-auto px-6 max-w-7xl">
           
@@ -81,43 +29,39 @@ export default function WishesWall() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {wishes.map((wish, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="bg-pearl-white p-10 border border-luxury-gold/20 shadow-sm relative group hover:shadow-md transition-shadow duration-300 flex flex-col"
-              >
-                <Quote className="w-8 h-8 text-luxury-gold/30 absolute top-8 left-8" />
-                <p className="font-serif text-lg leading-relaxed text-elegant-black/80 mt-6 mb-8 relative z-10 italic flex-grow">
-                  "{wish.message}"
-                </p>
-                <div className="flex items-center gap-4 mt-auto">
-                  <div className="w-10 h-10 rounded-full bg-soft-ivory border border-luxury-gold flex items-center justify-center text-luxury-gold font-cormorant text-xl shrink-0">
-                    {wish.name.charAt(0)}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-sans font-bold text-elegant-black text-sm uppercase tracking-widest">{wish.name}</h4>
-                    <p className="font-sans text-xs text-elegant-black/50 uppercase tracking-widest">{wish.country}</p>
-                  </div>
-                  <button 
-                    onClick={() => handleLike(wish.id)}
-                    className="flex flex-col items-center justify-center gap-1 group/btn shrink-0"
-                    aria-label="Like this wish"
-                  >
-                    <Heart className={`w-5 h-5 transition-colors ${wish.likes && wish.likes > 0 ? 'text-red-500 fill-red-500' : 'text-luxury-gold group-hover/btn:text-red-400'}`} />
-                    <span className="font-sans text-[10px] text-elegant-black/60 font-bold">{wish.likes || 0}</span>
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {loading && (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-luxury-gold"></div>
+            </div>
+          )}
 
+          {error && (
+            <div className="text-center text-red-500 font-sans text-sm p-4 bg-red-50 rounded max-w-2xl mx-auto">
+              Could not load messages. Please try again later.
+            </div>
+          )}
+
+          {!loading && !error && wishes.length === 0 && (
+            <div className="text-center text-elegant-black/60 font-serif text-xl italic py-20">
+              The wish wall is currently empty. Be the first to leave a message!
+            </div>
+          )}
+
+          {!loading && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {wishes.map((wish, idx) => (
+                <WishCard 
+                  key={wish.id || idx} 
+                  wish={wish} 
+                  onLike={handleLike} 
+                  index={idx} 
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
+
       <ShareWidget />
     </>
   );

@@ -11,6 +11,30 @@ service cloud.firestore {
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
 
+    function isValidGuestbookMessage(data) {
+      return data.keys().hasAll(['fullName', 'message', 'createdAt', 'updatedAt', 'approved', 'likes', 'avatarColor']) &&
+             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+             data.message is string && data.message.size() >= 10 && data.message.size() <= 1000 &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp &&
+             data.approved is bool && data.approved == true &&
+             data.likes is number && data.likes == 0 &&
+             data.avatarColor is string && data.avatarColor.size() > 0 &&
+             (!('location' in data) || (data.location is string && data.location.size() <= 100)) &&
+             (!('device' in data) || (data.device is string && data.device.size() <= 100));
+    }
+
+    match /guestbook_messages/{messageId} {
+      allow read: if true;
+      allow create: if isValidId(messageId) && isValidGuestbookMessage(incoming());
+      allow update: if isValidId(messageId) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['likes']) &&
+        incoming().likes == existing().likes + 1
+      );
+      allow delete: if false;
+    }
+    
+    // Keep old wishes for backward compatibility
     function isValidWish(data) {
       return data.keys().hasAll(['name', 'country', 'message', 'createdAt', 'likes']) &&
              data.keys().size() == 5 &&

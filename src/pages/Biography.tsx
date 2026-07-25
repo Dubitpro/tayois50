@@ -55,7 +55,7 @@ export default function Biography() {
               transition={{ duration: 0.8 }}
               className="space-y-6"
             >
-              <h2 className="font-cormorant text-4xl text-elegant-black">A Visionary Leader</h2>
+              <h2 className="font-cormorant text-4xl text-elegant-black">A Visionary Woman / Leader</h2>
               <p className="font-sans text-elegant-black/80 leading-relaxed text-lg text-justify md:text-left">
                 Dr. Omotayo Oluseyi Osinaike, born in Lagos in 1976, grew up between Lagos and Ode Omu, shaped by strong family values, spiritual guidance, and disciplined academic foundations. Her faith deepened during her time at Federal Government Girls College, Akure, becoming the anchor for her identity. She pursued medicine at the University of Ibadan/UCH, a journey that strengthened her resilience. During this period, she married Ademola Osinaike and began building her family, welcoming three children between 2006 and 2015.
               </p>

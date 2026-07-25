@@ -47,6 +47,15 @@ export default function Home() {
     "https://i.pinimg.com/originals/3e/a4/8c/3ea48cf9823f9e95a18c1787fa955f38.jpg"
   ];
 
+  const sliderImages = [
+    "https://i.pinimg.com/736x/52/81/2f/52812fdad4390e7e95c8509f91421644.jpg",
+    "https://i.pinimg.com/736x/c6/e6/2b/c6e62b69ce27ce96c9af48d3d256441d.jpg",
+    "https://i.pinimg.com/736x/db/ab/b1/dbabb170e17873422934ac3831359853.jpg",
+    "https://i.pinimg.com/736x/88/a9/53/88a95334b962aeff0763c7b9566dd502.jpg",
+    "https://i.pinimg.com/736x/23/d9/99/23d999fa8581fbbca9712f42eb172d60.jpg",
+    "https://i.pinimg.com/736x/73/c1/06/73c10644ca72c6454f5a43de93756ef5.jpg"
+  ];
+
   const mobileHeroImages = [
     "https://i.pinimg.com/736x/b9/f0/38/b9f038fd9134e960488ba976fb172a92.jpg",
     "https://i.pinimg.com/736x/49/49/11/4949114018c15a5e6fa2067e94e266a1.jpg",
@@ -305,12 +314,53 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Sliding Photos Gallery */}
+      <section className="py-24 bg-elegant-black overflow-hidden border-t border-b border-luxury-gold/20">
+        <div className="container mx-auto px-6 text-center mb-16">
+          <h2 className="font-cormorant text-4xl md:text-5xl text-luxury-gold mb-6">A Journey Through Time</h2>
+          <div className="w-16 h-[1px] bg-luxury-gold/50 mx-auto mb-6"></div>
+          <p className="font-serif text-lg italic text-soft-ivory/80 max-w-2xl mx-auto">
+            A curated collection of unforgettable moments in time.
+          </p>
+        </div>
+        
+        {/* Infinite Slider */}
+        <div className="w-full flex relative overflow-hidden group">
+          <motion.div
+            className="flex gap-8 px-4"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{
+              duration: 30,
+              ease: "linear",
+              repeat: Infinity,
+            }}
+            style={{ width: "max-content" }}
+          >
+            {[...sliderImages, ...sliderImages].map((img, idx) => (
+              <div 
+                key={idx} 
+                className="w-[280px] h-[350px] md:w-[350px] md:h-[450px] flex-shrink-0 relative border border-luxury-gold/30 p-2 bg-soft-ivory/10"
+              >
+                <div className="w-full h-full relative overflow-hidden">
+                  <img 
+                    src={img} 
+                    alt="Gallery Memory" 
+                    className="w-full h-full object-cover transform transition-transform duration-700 hover:scale-110"
+                    referrerPolicy="no-referrer"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       {/* Highlights / Features */}
       <section className="py-24 bg-pearl-white border-t border-b border-luxury-gold/20">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="max-w-3xl mx-auto">
             {[
-              { title: "A Journey Through Time", desc: "A curated collection of unforgettable moments in time.", link: "/gallery" },
               { title: "Wishes Wall", desc: "Read heartfelt messages from dignitaries and citizens worldwide.", link: "/wishes" }
             ].map((item, idx) => (
               <motion.div 

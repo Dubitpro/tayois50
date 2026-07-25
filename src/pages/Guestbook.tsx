@@ -90,7 +90,7 @@ export default function Guestbook() {
 
   return (
     <>
-      <SEO title="Guestbook" description="Leave a congratulatory message on her Golden Jubilee." />
+      <SEO title="Message of Love" description="Leave a congratulatory message on her Golden Jubilee." />
         
       
 
@@ -99,7 +99,7 @@ export default function Guestbook() {
           
           <div className="text-center mb-16">
             <PenTool className="w-12 h-12 text-luxury-gold mx-auto mb-6" />
-            <h1 className="font-cormorant text-5xl md:text-7xl text-elegant-black mb-6">The Guestbook</h1>
+            <h1 className="font-cormorant text-5xl md:text-7xl text-elegant-black mb-6">Message of Love</h1>
             <div className="w-24 h-[2px] bg-luxury-gold mx-auto mb-8"></div>
             <p className="font-serif text-xl italic text-elegant-black/70">Leave a congratulatory message .</p>
           </div>
@@ -110,7 +110,7 @@ export default function Guestbook() {
             
             {submitSuccess && (
               <div className="mb-8 p-4 bg-green-50 border border-green-200 text-green-800 font-sans text-sm text-center">
-                Your message has been graciously received in the Guestbook.
+                Your message has been graciously received.
               </div>
             )}
             
@@ -159,7 +159,7 @@ export default function Guestbook() {
                   disabled={isSubmitting}
                   className="inline-flex items-center justify-center gap-2 bg-elegant-black text-luxury-gold px-12 py-4 font-sans text-sm uppercase tracking-widest hover:bg-elegant-black/90 transition-colors disabled:opacity-70"
                 >
-                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign Guestbook"}
+                  {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Message"}
                 </button>
               </div>
             </form>
@@ -167,7 +167,7 @@ export default function Guestbook() {
 
           {/* Entries */}
           <div className="space-y-8">
-            <h3 className="font-cormorant text-3xl text-center text-elegant-black mb-10">Recent Signatures</h3>
+            <h3 className="font-cormorant text-3xl text-center text-elegant-black mb-10">Recent Messages</h3>
             {entries.map((entry, idx) => (
               <motion.div 
                 key={entry.id || idx}

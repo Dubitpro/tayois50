@@ -47,7 +47,7 @@ export default function AdminDashboard() {
               </li>
               <li>
                 <button className="w-full flex items-center gap-3 px-4 py-3 text-pearl-white/70 hover:text-luxury-gold hover:bg-luxury-gold/5 rounded transition-colors font-sans text-sm tracking-widest uppercase">
-                  <BookOpen size={18} /> Guestbook
+                  <BookOpen size={18} /> Message of Love
                 </button>
               </li>
               <li>
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="bg-pearl-white border border-luxury-gold/20 shadow-sm rounded overflow-hidden">
                   <div className="p-6 border-b border-luxury-gold/10 flex justify-between items-center">
-                    <h2 className="font-cormorant text-2xl text-elegant-black">Recent Guestbook Signatures</h2>
+                    <h2 className="font-cormorant text-2xl text-elegant-black">Recent Messages of Love</h2>
                     <button className="text-xs font-sans uppercase tracking-widest text-luxury-gold hover:underline">View All</button>
                   </div>
                   <div className="p-6">

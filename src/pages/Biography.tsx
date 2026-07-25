@@ -112,24 +112,6 @@ export default function Biography() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div className="p-8 border border-luxury-gold/20 bg-pearl-white">
-              <Award className="w-10 h-10 text-luxury-gold mx-auto mb-4" />
-              <h4 className="font-cormorant text-2xl mb-2">50+ Honors</h4>
-              <p className="text-sm text-elegant-black/60">Global Awards & Recognitions</p>
-            </div>
-            <div className="p-8 border border-luxury-gold/20 bg-pearl-white">
-              <Heart className="w-10 h-10 text-luxury-gold mx-auto mb-4" />
-              <h4 className="font-cormorant text-2xl mb-2">1M+ Lives</h4>
-              <p className="text-sm text-elegant-black/60">Impacted through charity</p>
-            </div>
-            <div className="p-8 border border-luxury-gold/20 bg-pearl-white">
-              <Globe className="w-10 h-10 text-luxury-gold mx-auto mb-4" />
-              <h4 className="font-cormorant text-2xl mb-2">120 Countries</h4>
-              <p className="text-sm text-elegant-black/60">Global influence and reach</p>
-            </div>
-          </div>
-
         </div>
       </div>
     </>

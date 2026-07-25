@@ -45,22 +45,15 @@ export default function Home() {
   // Hero Images State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const heroImages = [
-    "/1.jpg",
-    "/2.jpg",
-    "/3.jpg",
-    "/4.jpg"
-  ];
-  
-  const mobileHeroImages = [
-    "https://i.pinimg.com/736x/b9/f0/38/b9f038fd9134e960488ba976fb172a92.jpg",
-    "https://i.pinimg.com/736x/49/49/11/4949114018c15a5e6fa2067e94e266a1.jpg",
-    "https://i.pinimg.com/736x/68/9f/53/689f531d57dd0f4630e5ad26fbfc5b9c.jpg",
-    "https://i.pinimg.com/736x/6a/3b/55/6a3b55253d419f3f3b08ea9c1bd731ec.jpg"
+    "https://i.pinimg.com/originals/92/89/9f/92899fb2d805df463febd6444206c987.jpg",
+    "https://i.pinimg.com/originals/4f/0e/52/4f0e522bbe0f27794e91c25d66df7cb7.jpg",
+    "https://i.pinimg.com/originals/73/ec/4a/73ec4a429e49beed3817641432a00c3a.jpg",
+    "https://i.pinimg.com/originals/3e/a4/8c/3ea48cf9823f9e95a18c1787fa955f38.jpg"
   ];
   
   // Preload hero images for seamless transitions
   useEffect(() => {
-    [...heroImages, ...mobileHeroImages].forEach((src) => {
+    heroImages.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
@@ -92,7 +85,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
-    }, 6000);
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -136,34 +129,8 @@ export default function Home() {
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-black/40 z-10" />
           
-          {/* Mobile Hero Images (Slideshow) */}
-          <div className="absolute inset-0 w-full h-full md:hidden">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentImageIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1.5, ease: "easeInOut" }}
-                className="absolute inset-0 w-full h-full"
-              >
-                <motion.img 
-                  initial={{ scale: 1.05 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 1.5, ease: "easeInOut" }}
-                  src={mobileHeroImages[currentImageIndex]} 
-                  alt="Portrait Mobile" 
-                  className="absolute inset-0 w-full h-full object-cover object-[center_top]"
-                  referrerPolicy="no-referrer"
-                  fetchPriority="high"
-                  decoding="async"
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Desktop Hero Images (Slideshow) */}
-          <div className="absolute inset-0 w-full h-full hidden md:block">
+          {/* Desktop & Landscape Hero Images (Slideshow) */}
+          <div className="absolute inset-0 w-full h-full hidden md:block landscape:block">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentImageIndex}
@@ -408,7 +375,7 @@ export default function Home() {
                     to="/guestbook" 
                     className="text-xs uppercase tracking-widest text-luxury-gold font-bold hover:underline underline-offset-4"
                   >
-                    Copy to Guestbook
+                    Copy to Message of Love
                   </Link>
                 </motion.div>
               )}

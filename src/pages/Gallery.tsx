@@ -4,20 +4,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const defaultImages = [
-  "/6.jpg",
-  "/osinaike-1.jpg",
-  "/osinaike-10.jpg",
-  "/osinaike-2.jpg",
-  "/osinaike-2b.jpg",
-  "/osinaike-3c2.jpg",
-  "/osinaike-4.jpg",
-  "/osinaike-5b.jpg",
-  "/osinaike-6.jpg",
-  "/osinaike-7.jpg",
-  "/osinaike-7c.jpg",
-  "/osinaike-8b2.jpg",
-  "/osinaike-8d4.jpg",
-  "/osinaike-9.jpg"
+  "https://i.pinimg.com/originals/0b/5f/13/0b5f13ee309e4aa2e9b3d7d864a235d0.jpg",
+  "https://i.pinimg.com/originals/21/eb/ca/21ebcaaad4d28a822e9e149c166428d1.jpg",
+  "https://i.pinimg.com/originals/2b/00/ab/2b00abecb4527f39e493600010d73c21.jpg",
+  "https://i.pinimg.com/originals/2f/30/eb/2f30eba5dfb8ff2c3daca09b281ee313.jpg",
+  "https://i.pinimg.com/originals/3a/c4/23/3ac4237586ca6f6287e076e4a67a95f9.jpg",
+  "https://i.pinimg.com/originals/3c/91/1f/3c911fb1d8d2c01addc7b05267f3eb83.jpg",
+  "https://i.pinimg.com/originals/63/b8/5e/63b85e079d030392eeef55ae65a541e6.jpg",
+  "https://i.pinimg.com/originals/79/68/6c/79686c6940d1dbaab2cec8f8edeeef8e.jpg",
+  "https://i.pinimg.com/originals/84/f1/b0/84f1b0c535be0b1ca9746f8f37312e5f.jpg",
+  "https://i.pinimg.com/originals/b0/56/35/b05635f79a1ed01406ea1d0c7dea1741.jpg",
+  "https://i.pinimg.com/originals/cb/46/01/cb4601f1a7763f83069120039c5199aa.jpg",
+  "https://i.pinimg.com/originals/db/d8/d2/dbd8d22ef61d0b9d4786ed5708640568.jpg",
+  "https://i.pinimg.com/originals/e6/6e/70/e66e7002bd1476084ddb834e1f3d1783.jpg",
+  "https://i.pinimg.com/originals/e8/e0/4a/e8e04ad75b29e2cf0918a4100eedce1d.jpg",
+  "https://i.pinimg.com/originals/f0/45/ef/f045efa47074c99e8b8b7ded6addcd1f.jpg"
 ];
 
 export default function Gallery() {

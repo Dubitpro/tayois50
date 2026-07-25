@@ -10,10 +10,12 @@ export default function MainLayout() {
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const handleEnter = () => {
-    setLoading(false);
-    setIsPlaying(true);
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleMusic = () => {
     setIsPlaying(!isPlaying);
@@ -38,16 +40,9 @@ export default function MainLayout() {
             >
               <Crown className="w-20 h-20 text-luxury-gold mx-auto mb-6" />
               <h1 className="font-cormorant text-4xl md:text-6xl text-luxury-gold tracking-widest uppercase">
-                Golden Jubilee
+                TAYO IS 50
               </h1>
               <div className="mt-8 mb-12 w-px h-16 bg-gradient-to-b from-luxury-gold to-transparent mx-auto"></div>
-              
-              <button
-                onClick={handleEnter}
-                className="px-8 py-3 border border-luxury-gold text-luxury-gold font-sans text-sm uppercase tracking-widest hover:bg-luxury-gold hover:text-elegant-black transition-colors duration-300"
-              >
-                Enter Celebration
-              </button>
             </motion.div>
           </motion.div>
         )}

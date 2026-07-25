@@ -9,7 +9,7 @@ const navLinks = [
   { title: 'Biography', path: '/biography' },
   { title: 'Gallery', path: '/gallery' },
   { title: 'Wishes Wall', path: '/wishes' },
-  { title: 'Guestbook', path: '/guestbook' },
+  { title: 'Message of Love', path: '/guestbook' },
 ];
 
 export default function Navbar() {
@@ -40,10 +40,10 @@ export default function Navbar() {
         <Link to="/" className="flex items-center gap-3 group">
           <Crown className={cn("w-8 h-8 transition-colors duration-300", needsBackground ? "text-luxury-gold" : "text-luxury-gold md:text-pearl-white")} />
           <span className={cn(
-            "font-cormorant text-2xl font-bold tracking-widest transition-colors duration-300 lowercase",
+            "font-cormorant text-2xl font-bold tracking-widest transition-colors duration-300",
             needsBackground ? "text-elegant-black" : "text-pearl-white"
           )}>
-            tayois50
+            TAYOIS50
           </span>
         </Link>
 

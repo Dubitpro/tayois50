@@ -83,21 +83,7 @@ export const submitMessage = async (data: { fullName: string; country: string; m
   // Record submission time
   localStorage.setItem(storageKey, Date.now().toString());
   
-  // Wait for up to 5 seconds for server acknowledgment. 
-  // If it takes longer, we assume we're offline and the optimistic update has already applied.
-  try {
-    await Promise.race([
-      promise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 5000))
-    ]);
-  } catch (e: any) {
-    if (e.message !== 'TIMEOUT') {
-      throw e; // Real error from rules
-    }
-    // If it's a timeout, we just return. The local cache has already updated.
-    // When they get back online, it will sync.
-  }
-  
+  await promise;
   return;
 };
 

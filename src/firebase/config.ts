@@ -3,13 +3,15 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
+// Force the use of the provisioned AI Studio database, ignoring user environment variables
+// that might point to a misconfigured or disabled Firebase project.
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBdLI83uB9QALjeaP3I0CygGO4oviclYSw",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "mimetic-doodad-wcf5x.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "mimetic-doodad-wcf5x",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "mimetic-doodad-wcf5x.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "551906513934",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:551906513934:web:87089353057cd6aaed985f"
+  apiKey: "AIzaSyBdLI83uB9QALjeaP3I0CygGO4oviclYSw",
+  authDomain: "mimetic-doodad-wcf5x.firebaseapp.com",
+  projectId: "mimetic-doodad-wcf5x",
+  storageBucket: "mimetic-doodad-wcf5x.firebasestorage.app",
+  messagingSenderId: "551906513934",
+  appId: "1:551906513934:web:87089353057cd6aaed985f"
 };
 
 export const isFirebaseConfigured = true;

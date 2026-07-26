@@ -30,13 +30,13 @@ service cloud.firestore {
              data.message is string && data.message.size() >= 5 && data.message.size() <= 600 &&
              data.createdAtUnix is number &&
              data.status == 'approved' &&
-             data.anonymousId is string && data.anonymousId == request.auth.uid &&
+             data.anonymousId is string && data.anonymousId.size() > 0 && data.anonymousId.size() <= 60 &&
              data.isPinned is bool && data.isPinned == false;
     }
 
     match /messages/{messageId} {
       allow read: if true;
-      allow create: if request.auth != null && isValidMessage(incoming());
+      allow create: if isValidMessage(incoming());
       allow update: if isValidId(messageId) && incoming().diff(existing()).affectedKeys().hasOnly(['likes', 'heartReactions', 'smileReactions', 'celebrateReactions']);
       allow delete: if false;
     }

@@ -66,7 +66,7 @@ export default function Navbar() {
             "font-cormorant text-xl md:text-2xl font-bold tracking-widest transition-colors duration-300",
             needsBackground ? "text-elegant-black" : "text-pearl-white"
           )}>
-            TAYOIS50
+            Tayois50
           </span>
         </Link>
 

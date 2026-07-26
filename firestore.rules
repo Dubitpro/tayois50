@@ -24,13 +24,27 @@ service cloud.firestore {
              (!('device' in data) || (data.device is string && data.device.size() <= 100));
     }
 
-    match /guestbook_messages/{messageId} {
+    function isValidMessage(data) {
+      return data.keys().hasAll(['fullName', 'country', 'message', 'createdAt', 'createdAtUnix', 'status', 'likes', 'heartReactions', 'smileReactions', 'celebrateReactions', 'anonymousId', 'isPinned', 'isEdited']) &&
+             data.fullName is string && data.fullName.size() >= 3 && data.fullName.size() <= 50 &&
+             data.country is string && data.country.size() > 0 && data.country.size() <= 50 &&
+             data.message is string && data.message.size() >= 10 && data.message.size() <= 500 &&
+             data.createdAt is timestamp &&
+             data.createdAtUnix is number &&
+             data.status == 'approved' &&
+             data.likes is number && data.likes == 0 &&
+             data.heartReactions is number && data.heartReactions == 0 &&
+             data.smileReactions is number && data.smileReactions == 0 &&
+             data.celebrateReactions is number && data.celebrateReactions == 0 &&
+             data.anonymousId is string && data.anonymousId == request.auth.uid &&
+             data.isPinned is bool && data.isPinned == false &&
+             data.isEdited is bool && data.isEdited == false;
+    }
+
+    match /messages/{messageId} {
       allow read: if true;
-      allow create: if isValidId(messageId) && isValidGuestbookMessage(incoming());
-      allow update: if isValidId(messageId) && (
-        incoming().diff(existing()).affectedKeys().hasOnly(['likes']) &&
-        incoming().likes == existing().likes + 1
-      );
+      allow create: if request.auth != null && isValidId(messageId) && isValidMessage(incoming());
+      allow update: if isValidId(messageId) && incoming().diff(existing()).affectedKeys().hasOnly(['likes', 'heartReactions', 'smileReactions', 'celebrateReactions']);
       allow delete: if false;
     }
     

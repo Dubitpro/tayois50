@@ -38,20 +38,30 @@ export const getMessagesQuery = (pageSize: number, lastDoc: QueryDocumentSnapsho
 
 // Rate limiting checking
 export const canSubmitMessage = async (anonymousId: string): Promise<boolean> => {
-  const tenMinsAgo = Date.now() - 10 * 60 * 1000;
   const q = query(
     collection(db, MESSAGES_COLLECTION),
-    where('anonymousId', '==', anonymousId),
-    where('createdAtUnix', '>=', tenMinsAgo)
+    where('anonymousId', '==', anonymousId)
   );
   const snapshot = await getDocs(q);
-  return snapshot.size < 3;
+  const tenMinsAgo = Date.now() - 10 * 60 * 1000;
+  let count = 0;
+  snapshot.forEach((doc) => {
+    if (doc.data().createdAtUnix >= tenMinsAgo) {
+      count++;
+    }
+  });
+  return count < 3;
 };
 
 export const submitMessage = async (data: { fullName: string; country: string; message: string }, anonymousId: string) => {
-  const isAllowed = await canSubmitMessage(anonymousId);
-  if (!isAllowed) {
-    throw new Error('Rate limit exceeded. Please wait before posting again.');
+  // We can do rate limiting locally to avoid blocking the optimistic update
+  const storageKey = `last_submit_${anonymousId}`;
+  const lastSubmitStr = localStorage.getItem(storageKey);
+  if (lastSubmitStr) {
+    const lastSubmit = parseInt(lastSubmitStr, 10);
+    if (Date.now() - lastSubmit < 3 * 60 * 1000) {
+      throw new Error('Please wait a few minutes before posting again.');
+    }
   }
 
   const newMessage: Omit<Message, 'id'> = {
@@ -68,7 +78,27 @@ export const submitMessage = async (data: { fullName: string; country: string; m
     isEdited: false,
   };
 
-  return await addDoc(collection(db, MESSAGES_COLLECTION), newMessage);
+  const promise = addDoc(collection(db, MESSAGES_COLLECTION), newMessage);
+  
+  // Record submission time
+  localStorage.setItem(storageKey, Date.now().toString());
+  
+  // Wait for up to 5 seconds for server acknowledgment. 
+  // If it takes longer, we assume we're offline and the optimistic update has already applied.
+  try {
+    await Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 5000))
+    ]);
+  } catch (e: any) {
+    if (e.message !== 'TIMEOUT') {
+      throw e; // Real error from rules
+    }
+    // If it's a timeout, we just return. The local cache has already updated.
+    // When they get back online, it will sync.
+  }
+  
+  return;
 };
 
 export const toggleReaction = async (messageId: string, reactionType: ReactionType, currentUserId: string) => {

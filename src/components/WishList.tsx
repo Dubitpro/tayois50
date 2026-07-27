@@ -72,7 +72,7 @@ export default function WishList() {
           ) : (
             <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {messages.map((msg, idx) => (
-                <WishCard key={msg.id} message={msg} index={idx % 20} />
+                <WishCard key={msg.id} post={msg} index={idx % 20} />
               ))}
             </motion.div>
           )}

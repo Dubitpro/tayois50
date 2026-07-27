@@ -12,12 +12,60 @@
         "likes": { "type": "number" }
       },
       "required": ["name", "country", "message", "createdAt", "likes"]
+    },
+    "WishPost": {
+      "title": "WishPost",
+      "description": "A social media style wish post, can be text or video",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["text", "video"] },
+        "fullName": { "type": "string", "maxLength": 100 },
+        "country": { "type": "string", "maxLength": 100 },
+        "message": { "type": "string", "maxLength": 2000 },
+        "caption": { "type": "string", "maxLength": 500 },
+        "videoUrl": { "type": "string", "maxLength": 1000 },
+        "thumbnailUrl": { "type": "string", "maxLength": 1000 },
+        "duration": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "createdAtUnix": { "type": "number" },
+        "likes": { "type": "number" },
+        "hearts": { "type": "number" },
+        "comments": { "type": "number" },
+        "shares": { "type": "number" },
+        "views": { "type": "number" },
+        "anonymousId": { "type": "string", "maxLength": 100 },
+        "status": { "type": "string", "enum": ["approved", "pending", "rejected"] }
+      },
+      "required": ["type", "fullName", "country", "createdAtUnix", "status", "anonymousId"]
+    },
+    "PlaylistTrack": {
+      "title": "PlaylistTrack",
+      "description": "A track in the music playlist",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200 },
+        "artist": { "type": "string", "maxLength": 200 },
+        "coverImage": { "type": "string", "maxLength": 1000 },
+        "audioUrl": { "type": "string", "maxLength": 1000 },
+        "duration": { "type": "number" },
+        "order": { "type": "number" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["title", "artist", "audioUrl", "order", "active"]
     }
   },
   "firestore": {
     "wishes/{wishId}": {
       "schema": { "$ref": "#/entities/Wish" },
-      "description": "The collection of wishes"
+      "description": "The old collection of wishes"
+    },
+    "wishPosts/{postId}": {
+      "schema": { "$ref": "#/entities/WishPost" },
+      "description": "The new social media style wish posts"
+    },
+    "playlist/{trackId}": {
+      "schema": { "$ref": "#/entities/PlaylistTrack" },
+      "description": "The music playlist tracks"
     }
   }
 }

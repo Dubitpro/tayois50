@@ -1,73 +1,73 @@
 import React, { useState } from 'react';
-import { toggleReaction } from '../services/messageService';
-import { Message, ReactionType } from '../types/message';
+import { togglePostReaction, WishPost } from '../services/wishPostsService';
+import { Heart, MessageCircle, Share2, Eye } from 'lucide-react';
 
 interface ReactionBarProps {
-  message: Message;
+  post: WishPost;
   currentUserId: string | null;
 }
 
-export default function ReactionBar({ message, currentUserId }: ReactionBarProps) {
+export default function ReactionBar({ post, currentUserId }: ReactionBarProps) {
   const [error, setError] = useState<string | null>(null);
 
-  const handleReaction = async (type: ReactionType) => {
-    if (!currentUserId || !message.id) return;
-    
+  const handleReaction = async (type: 'likes' | 'hearts') => {
+    if (!currentUserId || !post.id) return;
     try {
       setError(null);
-      await toggleReaction(message.id, type, currentUserId);
+      await togglePostReaction(post.id, type, currentUserId);
     } catch (err: any) {
       setError(err.message);
       setTimeout(() => setError(null), 3000);
     }
   };
 
-  const hasReacted = (type: ReactionType) => {
-    if (!message.id) return false;
-    return localStorage.getItem(`reacted_${message.id}_${type}`) === 'true';
+  const hasReacted = (type: 'likes' | 'hearts') => {
+    if (!post.id) return false;
+    return localStorage.getItem(`reacted_post_${post.id}_${type}`) === 'true';
+  };
+
+  const handleShare = () => {
+    if (navigator.share && post.id) {
+      navigator.share({
+        title: `${post.fullName}'s Wish on Tayo's Golden Jubilee`,
+        text: post.type === 'text' ? post.message : post.caption,
+        url: window.location.origin + `/wishes?post=${post.id}`
+      }).catch(console.error);
+    }
   };
 
   return (
-    <div className="pt-5 border-t border-luxury-gold/10 mt-auto">
-      <div className="flex gap-2 items-center">
-        <button 
-          onClick={() => handleReaction('heartReactions')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-sans transition-all ${
-            hasReacted('heartReactions') 
-              ? 'bg-red-50 text-red-600 border border-red-100' 
-              : 'bg-white hover:bg-red-50 text-elegant-black/60 hover:text-red-600 border border-luxury-gold/20'
-          }`}
-          aria-label="Heart reaction"
-        >
-          <span>❤️</span>
-          <span className="font-medium">{message.heartReactions || 0}</span>
-        </button>
-
-        <button 
-          onClick={() => handleReaction('smileReactions')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-sans transition-all ${
-            hasReacted('smileReactions') 
-              ? 'bg-orange-50 text-orange-600 border border-orange-100' 
-              : 'bg-white hover:bg-orange-50 text-elegant-black/60 hover:text-orange-600 border border-luxury-gold/20'
-          }`}
-          aria-label="Smile reaction"
-        >
-          <span>😊</span>
-          <span className="font-medium">{message.smileReactions || 0}</span>
-        </button>
-
-        <button 
-          onClick={() => handleReaction('celebrateReactions')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-sans transition-all ${
-            hasReacted('celebrateReactions') 
-              ? 'bg-blue-50 text-blue-600 border border-blue-100' 
-              : 'bg-white hover:bg-blue-50 text-elegant-black/60 hover:text-blue-600 border border-luxury-gold/20'
-          }`}
-          aria-label="Celebrate reaction"
-        >
-          <span>🎉</span>
-          <span className="font-medium">{message.celebrateReactions || 0}</span>
-        </button>
+    <div className="pt-4 border-t border-luxury-gold/10 mt-auto">
+      <div className="flex justify-between items-center text-elegant-black/60">
+        <div className="flex gap-4 items-center">
+          <button 
+            onClick={() => handleReaction('hearts')}
+            className={`flex items-center gap-1.5 transition-all ${
+              hasReacted('hearts') 
+                ? 'text-red-500' 
+                : 'hover:text-red-500'
+            }`}
+            aria-label="Heart reaction"
+          >
+            <Heart size={18} className={hasReacted('hearts') ? "fill-current" : ""} />
+            <span className="font-medium text-xs">{post.hearts || 0}</span>
+          </button>
+          
+          <button className="flex items-center gap-1.5 hover:text-elegant-black transition-all">
+            <MessageCircle size={18} />
+            <span className="font-medium text-xs">{post.comments || 0}</span>
+          </button>
+          
+          <button onClick={handleShare} className="flex items-center gap-1.5 hover:text-elegant-black transition-all">
+            <Share2 size={18} />
+            <span className="font-medium text-xs">{post.shares || 0}</span>
+          </button>
+        </div>
+        
+        <div className="flex items-center gap-1.5 text-xs">
+          <Eye size={16} />
+          <span>{post.views || 0}</span>
+        </div>
       </div>
       
       {error && <p className="text-red-500 text-[10px] mt-2 absolute">{error}</p>}

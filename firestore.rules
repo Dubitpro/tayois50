@@ -4,25 +4,13 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if false;
     }
-
+    
     function isValidId(id) {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
+    
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
-
-    function isValidGuestbookMessage(data) {
-      return data.keys().hasAll(['fullName', 'message', 'createdAt', 'updatedAt', 'approved', 'likes', 'avatarColor']) &&
-             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
-             data.message is string && data.message.size() >= 10 && data.message.size() <= 1000 &&
-             data.createdAt is timestamp &&
-             data.updatedAt is timestamp &&
-             data.approved is bool && data.approved == true &&
-             data.likes is number && data.likes == 0 &&
-             data.avatarColor is string && data.avatarColor.size() > 0 &&
-             (!('location' in data) || (data.location is string && data.location.size() <= 100)) &&
-             (!('device' in data) || (data.device is string && data.device.size() <= 100));
-    }
 
     function isValidMessage(data) {
       return data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 60 &&
@@ -39,6 +27,37 @@ service cloud.firestore {
       allow create: if isValidMessage(incoming());
       allow update: if isValidId(messageId) && incoming().diff(existing()).affectedKeys().hasOnly(['likes', 'heartReactions', 'smileReactions', 'celebrateReactions']);
       allow delete: if false;
+    }
+
+    function isValidWishPost(data) {
+      return data.type is string && data.type in ['text', 'video'] &&
+             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+             data.country is string && data.country.size() > 0 && data.country.size() <= 100 &&
+             data.createdAtUnix is number &&
+             data.status == 'approved' &&
+             data.anonymousId is string && data.anonymousId.size() > 0 && data.anonymousId.size() <= 100 &&
+             (!('message' in data) || (data.message is string && data.message.size() <= 2000)) &&
+             (!('caption' in data) || (data.caption is string && data.caption.size() <= 500)) &&
+             (!('videoUrl' in data) || (data.videoUrl is string && data.videoUrl.size() <= 1000)) &&
+             (!('thumbnailUrl' in data) || (data.thumbnailUrl is string && data.thumbnailUrl.size() <= 1000)) &&
+             (!('duration' in data) || data.duration is number) &&
+             data.likes is number && data.likes == 0 &&
+             data.hearts is number && data.hearts == 0 &&
+             data.comments is number && data.comments == 0 &&
+             data.shares is number && data.shares == 0 &&
+             data.views is number && data.views == 0;
+    }
+
+    match /wishPosts/{postId} {
+      allow read: if true;
+      allow create: if isValidWishPost(incoming());
+      allow update: if isValidId(postId) && incoming().diff(existing()).affectedKeys().hasOnly(['likes', 'hearts', 'comments', 'shares', 'views']);
+      allow delete: if false;
+    }
+
+    match /playlist/{trackId} {
+      allow read: if true;
+      allow create, update, delete: if false; // Only admin can modify playlist
     }
     
     // Keep old wishes for backward compatibility

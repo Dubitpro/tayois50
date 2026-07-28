@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Quote, Play } from 'lucide-react';
+import { Quote, Play, Pause } from 'lucide-react';
 import { WishPost, incrementViewCount } from '../services/wishPostsService';
 import { timeAgo } from '../utils/timeAgo';
 import ReactionBar from './ReactionBar';
@@ -13,15 +13,43 @@ interface WishCardProps {
 }
 
 const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play().catch(console.error);
+        setIsPlaying(true);
+      } else {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      }
+    }
+  };
+
   return (
-    <video 
-      src={url} 
-      poster={poster}
-      controls
-      playsInline
-      preload="metadata"
-      className="w-full h-full object-contain bg-black"
-    />
+    <div className="relative w-full h-full cursor-pointer group" onClick={togglePlay}>
+      <video 
+        ref={videoRef}
+        src={url} 
+        poster={poster}
+        playsInline
+        preload="metadata"
+        className="w-full h-full object-contain bg-black"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => setIsPlaying(false)}
+      />
+      {!isPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+          <div className="w-12 h-12 rounded-full bg-luxury-gold/90 flex items-center justify-center text-white backdrop-blur-sm transform group-hover:scale-110 transition-transform">
+            <Play className="w-6 h-6 ml-1" fill="currentColor" />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

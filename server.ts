@@ -39,13 +39,25 @@ async function startServer() {
     limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
   });
 
-  app.post('/api/upload', upload.single('video'), (req, res) => {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded.' });
-    }
-    // Return the URL to access the uploaded file
-    const fileUrl = `/uploads/${req.file.filename}`;
-    res.json({ url: fileUrl });
+  app.post('/api/upload', (req, res, next) => {
+    upload.any()(req, res, function (err) {
+      if (err) {
+        console.error("Multer error:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      
+      console.log("Upload route hit. req.body:", req.body);
+      console.log("req.files:", req.files);
+      
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: 'No file uploaded.' });
+      }
+      
+      // Return the URL to access the uploaded file
+      const file = (req.files as any)[0];
+      const fileUrl = `/uploads/${file.filename}`;
+      res.json({ url: fileUrl });
+    });
   });
 
   // Serve uploads publicly in all environments

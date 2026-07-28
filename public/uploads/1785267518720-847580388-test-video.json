@@ -1,0 +1,14 @@
+{
+  "type": "video",
+  "fullName": "Test User",
+  "country": "USA",
+  "videoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+  "createdAtUnix": 1718000000,
+  "status": "approved",
+  "anonymousId": "test",
+  "likes": 0,
+  "hearts": 0,
+  "comments": 0,
+  "shares": 0,
+  "views": 0
+}

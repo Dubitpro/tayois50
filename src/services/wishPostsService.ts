@@ -115,7 +115,7 @@ export const uploadVideo = async (
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const formData = new FormData();
-    formData.append('video', file);
+    formData.append('video', file, file.name || 'upload.mp4');
 
     const xhr = new XMLHttpRequest();
     

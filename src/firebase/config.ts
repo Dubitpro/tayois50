@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
@@ -17,6 +17,6 @@ const firebaseConfig = {
 export const isFirebaseConfigured = true;
 
 export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, "ai-studio-goldenjubileetri-5ee88f96-8f10-4ab6-8db1-9535ed1ec3ce");
+export const db = initializeFirestore(app, { experimentalForceLongPolling: true }, "ai-studio-goldenjubileetri-5ee88f96-8f10-4ab6-8db1-9535ed1ec3ce");
 export const auth = getAuth(app);
 export const storage = getStorage(app);

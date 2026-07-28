@@ -114,37 +114,45 @@ export const uploadVideo = async (
   onProgress: (progress: number) => void
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append('video', file, file.name || 'upload.mp4');
-
-    const xhr = new XMLHttpRequest();
+    // Generate unique filename: wish-wall/videos/{timestamp}-{random}-{originalFilename}
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    const safeFilename = file.name ? file.name.replace(/[^a-zA-Z0-9.-]/g, '_') : 'upload.mp4';
+    const filePath = `wish-wall/videos/${timestamp}-${random}-${safeFilename}`;
     
-    xhr.upload.addEventListener('progress', (event) => {
-      if (event.lengthComputable) {
-        const progress = (event.loaded / event.total) * 100;
+    const storageRef = ref(storage, filePath);
+    
+    // Create the file metadata
+    const metadata = {
+      contentType: file.type,
+      customMetadata: {
+        userId: userId
+      }
+    };
+    
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+    
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        // Observe state change events such as progress, pause, and resume
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         onProgress(progress);
-      }
-    });
-
-    xhr.addEventListener('load', () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
+      },
+      (error) => {
+        // Handle unsuccessful uploads
+        reject(new Error(`Upload failed: ${error.message}`));
+      },
+      async () => {
+        // Handle successful uploads on complete
         try {
-          const response = JSON.parse(xhr.responseText);
-          resolve(response.url);
-        } catch (e) {
-          reject(new Error('Invalid response from server'));
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(downloadURL);
+        } catch (error: any) {
+          reject(new Error(`Failed to get download URL: ${error.message}`));
         }
-      } else {
-        reject(new Error(`Upload failed with status ${xhr.status}`));
       }
-    });
-
-    xhr.addEventListener('error', () => {
-      reject(new Error('Network error during upload'));
-    });
-
-    xhr.open('POST', '/api/upload');
-    xhr.send(formData);
+    );
   });
 };
 

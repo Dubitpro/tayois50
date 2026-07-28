@@ -16,6 +16,15 @@ const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
+  if (url && url.startsWith('/uploads/')) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-black/10 rounded-xl">
+        <p className="text-elegant-black/60 font-medium">Video unavailable</p>
+        <p className="text-xs text-elegant-black/40 mt-1">This video is no longer accessible.</p>
+      </div>
+    );
+  }
+
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (videoRef.current) {
@@ -33,18 +42,20 @@ const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
     <div className="relative w-full h-full cursor-pointer group" onClick={togglePlay}>
       <video 
         ref={videoRef}
-        src={url} 
         poster={poster}
+        controls
         playsInline
         preload="metadata"
         className="w-full h-full object-contain bg-black"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)}
-      />
+      >
+        <source src={url} type="video/mp4" />
+      </video>
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-          <div className="w-12 h-12 rounded-full bg-luxury-gold/90 flex items-center justify-center text-white backdrop-blur-sm transform group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-full bg-luxury-gold/90 flex items-center justify-center text-white backdrop-blur-sm transform group-hover:scale-110 transition-transform pointer-events-none">
             <Play className="w-6 h-6 ml-1" fill="currentColor" />
           </div>
         </div>

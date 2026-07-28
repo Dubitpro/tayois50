@@ -35,6 +35,14 @@ export default function MessageForm() {
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      
+      // Check file type
+      const validTypes = ['video/mp4', 'video/quicktime', 'video/webm'];
+      if (!validTypes.includes(file.type)) {
+        setSubmitError("Unsupported format. Please upload MP4, MOV, or WebM videos.");
+        return;
+      }
+      
       // Limit to 100MB
       if (file.size > 100 * 1024 * 1024) {
         setSubmitError("Video file size must be less than 100MB");

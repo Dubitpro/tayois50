@@ -1,84 +1,15 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-    
-    function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
-    }
-    
-    function incoming() { return request.resource.data; }
-    function existing() { return resource.data; }
-
-    function isValidMessage(data) {
-      return data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 60 &&
-             data.country is string && data.country.size() > 0 && data.country.size() <= 60 &&
-             data.message is string && data.message.size() >= 5 && data.message.size() <= 600 &&
-             data.createdAtUnix is number &&
-             data.status == 'approved' &&
-             data.anonymousId is string && data.anonymousId.size() > 0 && data.anonymousId.size() <= 60 &&
-             data.isPinned is bool && data.isPinned == false;
-    }
-
-    match /messages/{messageId} {
-      allow read: if true;
-      allow create: if isValidMessage(incoming());
-      allow update: if isValidId(messageId) && incoming().diff(existing()).affectedKeys().hasOnly(['likes', 'heartReactions', 'smileReactions', 'celebrateReactions']);
-      allow delete: if false;
-    }
-
-    function isValidWishPost(data) {
-      return data.type is string && data.type in ['text', 'video'] &&
-             data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
-             data.country is string && data.country.size() > 0 && data.country.size() <= 100 &&
-             data.createdAtUnix is number &&
-             data.status == 'approved' &&
-             data.anonymousId is string && data.anonymousId.size() > 0 && data.anonymousId.size() <= 100 &&
-             (!('message' in data) || (data.message is string && data.message.size() <= 2000)) &&
-             (!('caption' in data) || (data.caption is string && data.caption.size() <= 500)) &&
-             (!('videoUrl' in data) || (data.videoUrl is string && data.videoUrl.size() <= 1000)) &&
-             (!('thumbnailUrl' in data) || (data.thumbnailUrl is string && data.thumbnailUrl.size() <= 1000)) &&
-             (!('duration' in data) || data.duration is number) &&
-             data.likes is number && data.likes == 0 &&
-             data.hearts is number && data.hearts == 0 &&
-             data.comments is number && data.comments == 0 &&
-             data.shares is number && data.shares == 0 &&
-             data.views is number && data.views == 0;
-    }
-
     match /wishPosts/{postId} {
       allow read: if true;
-      allow create: if isValidWishPost(incoming());
-      allow update: if isValidId(postId) && incoming().diff(existing()).affectedKeys().hasOnly(['likes', 'hearts', 'comments', 'shares', 'views']);
-      allow delete: if false;
+      allow create: if request.auth != null;
+      // Allow updates for likes, views, etc.
+      allow update: if request.auth != null; 
+      allow delete: if request.auth != null && request.auth.uid == resource.data.anonymousId;
     }
-
-    match /playlist/{trackId} {
-      allow read: if true;
-      allow create, update, delete: if false; // Only admin can modify playlist
-    }
-    
-    // Keep old wishes for backward compatibility
-    function isValidWish(data) {
-      return data.keys().hasAll(['name', 'country', 'message', 'createdAt', 'likes']) &&
-             data.keys().size() == 5 &&
-             data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
-             data.country is string && data.country.size() >= 2 && data.country.size() <= 100 &&
-             data.message is string && data.message.size() >= 10 && data.message.size() <= 1000 &&
-             data.createdAt is timestamp &&
-             data.likes is number && data.likes >= 0;
-    }
-
-    match /wishes/{wishId} {
-      allow read: if true;
-      allow create: if isValidId(wishId) && isValidWish(incoming());
-      allow update: if isValidId(wishId) && (
-        incoming().diff(existing()).affectedKeys().hasOnly(['likes']) &&
-        incoming().likes == existing().likes + 1
-      );
-      allow delete: if false;
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

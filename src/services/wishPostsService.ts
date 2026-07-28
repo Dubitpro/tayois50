@@ -114,26 +114,37 @@ export const uploadVideo = async (
   onProgress: (progress: number) => void
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `${userId}_${Date.now()}.${fileExtension}`;
-    const storageRef = ref(storage, `wish-videos/${userId}/${fileName}`);
+    const formData = new FormData();
+    formData.append('video', file);
 
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    const xhr = new XMLHttpRequest();
+    
+    xhr.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable) {
+        const progress = (event.loaded / event.total) * 100;
         onProgress(progress);
-      },
-      (error) => {
-        reject(error);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        resolve(downloadURL);
       }
-    );
+    });
+
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const response = JSON.parse(xhr.responseText);
+          resolve(response.url);
+        } catch (e) {
+          reject(new Error('Invalid response from server'));
+        }
+      } else {
+        reject(new Error(`Upload failed with status ${xhr.status}`));
+      }
+    });
+
+    xhr.addEventListener('error', () => {
+      reject(new Error('Network error during upload'));
+    });
+
+    xhr.open('POST', '/api/upload');
+    xhr.send(formData);
   });
 };
 

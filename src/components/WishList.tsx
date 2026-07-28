@@ -66,7 +66,7 @@ export default function WishList() {
               animate={{ opacity: 1 }}
               className="text-center py-20 bg-white/50 backdrop-blur-sm rounded-3xl border border-luxury-gold/10"
             >
-              <p className="font-serif text-2xl italic text-elegant-black/60 mb-2">No messages yet.</p>
+              <p className="font-cormorant text-2xl italic text-elegant-black/60 mb-2">No messages yet.</p>
               <p className="font-sans text-sm text-luxury-gold uppercase tracking-widest">Be the first to leave a message ❤️</p>
             </motion.div>
           ) : (

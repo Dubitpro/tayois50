@@ -72,11 +72,11 @@ export default function MessageForm() {
         ...data,
         type: postType,
         videoUrl: videoUrl || undefined,
-        // Optional: generate a thumbnailUrl using canvas if needed, skipping for now
       }, user.uid);
       
       setSubmitSuccess(true);
       reset();
+      setPostType('text');
       setVideoFile(null);
       setUploadProgress(0);
       
@@ -154,7 +154,7 @@ export default function MessageForm() {
               id="fullName"
               {...register("fullName")}
               aria-invalid={errors.fullName ? "true" : "false"}
-              className={`w-full bg-transparent border-b ${errors.fullName ? 'border-red-400' : 'border-luxury-gold/30'} py-3 focus:outline-none focus:border-luxury-gold transition-colors font-serif text-lg text-elegant-black placeholder:text-elegant-black/30`}
+              className={`w-full bg-transparent border-b ${errors.fullName ? 'border-red-400' : 'border-luxury-gold/30'} py-3 focus:outline-none focus:border-luxury-gold transition-colors font-cormorant text-lg text-elegant-black placeholder:text-elegant-black/30`}
               placeholder="e.g. Lord Harrington"
             />
             {errors.fullName && <p className="text-red-500 text-xs mt-2" role="alert">{errors.fullName.message}</p>}
@@ -165,7 +165,7 @@ export default function MessageForm() {
               id="country"
               {...register("country")}
               aria-invalid={errors.country ? "true" : "false"}
-              className={`w-full bg-transparent border-b ${errors.country ? 'border-red-400' : 'border-luxury-gold/30'} py-3 focus:outline-none focus:border-luxury-gold transition-colors font-serif text-lg text-elegant-black placeholder:text-elegant-black/30`}
+              className={`w-full bg-transparent border-b ${errors.country ? 'border-red-400' : 'border-luxury-gold/30'} py-3 focus:outline-none focus:border-luxury-gold transition-colors font-cormorant text-lg text-elegant-black placeholder:text-elegant-black/30`}
               placeholder="e.g. United Kingdom"
             />
             {errors.country && <p className="text-red-500 text-xs mt-2" role="alert">{errors.country.message}</p>}
@@ -180,7 +180,7 @@ export default function MessageForm() {
               {...register("message")}
               rows={5}
               aria-invalid={errors.message ? "true" : "false"}
-              className={`w-full bg-transparent border-b ${errors.message ? 'border-red-400' : 'border-luxury-gold/30'} py-3 focus:outline-none focus:border-luxury-gold transition-colors font-serif text-lg resize-none text-elegant-black placeholder:text-elegant-black/30 leading-relaxed`}
+              className={`w-full bg-transparent border-b ${errors.message ? 'border-red-400' : 'border-luxury-gold/30'} py-3 focus:outline-none focus:border-luxury-gold transition-colors font-cormorant text-lg resize-none text-elegant-black placeholder:text-elegant-black/30 leading-relaxed`}
               placeholder="Write your heartfelt wishes here..."
             ></textarea>
             
@@ -204,7 +204,7 @@ export default function MessageForm() {
                 {...register("caption")}
                 rows={2}
                 aria-invalid={errors.caption ? "true" : "false"}
-                className={`w-full bg-transparent border-b ${errors.caption ? 'border-red-400' : 'border-luxury-gold/30'} py-3 focus:outline-none focus:border-luxury-gold transition-colors font-serif text-lg resize-none text-elegant-black placeholder:text-elegant-black/30 leading-relaxed`}
+                className={`w-full bg-transparent border-b ${errors.caption ? 'border-red-400' : 'border-luxury-gold/30'} py-3 focus:outline-none focus:border-luxury-gold transition-colors font-cormorant text-lg resize-none text-elegant-black placeholder:text-elegant-black/30 leading-relaxed`}
                 placeholder="Add a short caption..."
               ></textarea>
               <div className="flex justify-end mt-2">

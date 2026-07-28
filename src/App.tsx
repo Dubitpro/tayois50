@@ -26,9 +26,7 @@ export default function App() {
           <Router>
             <Routes>
               <Route path="/" element={<MainLayout />}>
-                <Route index element={<Home />} />
-                <Route path="biography" element={<Biography />} />
-                <Route path="gallery" element={<Gallery />} />
+                <Route index element={<Navigate to="/wishes" replace />} />
                 <Route path="guestbook" element={<Guestbook />} />
                 <Route path="wishes" element={<WishesWall />} />
               </Route>

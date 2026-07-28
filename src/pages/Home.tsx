@@ -41,6 +41,7 @@ export default function Home() {
   // Hero Images State
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const heroImages = [
+    "https://i.pinimg.com/736x/d5/28/e7/d528e7797473d9d66b478f8cdc230dab.jpg",
     "https://i.pinimg.com/originals/92/89/9f/92899fb2d805df463febd6444206c987.jpg",
     "https://i.pinimg.com/originals/4f/0e/52/4f0e522bbe0f27794e91c25d66df7cb7.jpg",
     "https://i.pinimg.com/originals/73/ec/4a/73ec4a429e49beed3817641432a00c3a.jpg",
@@ -57,6 +58,7 @@ export default function Home() {
   ];
 
   const mobileHeroImages = [
+    "https://i.pinimg.com/736x/fb/f1/43/fbf14334f94186ecd1077639da4c768c.jpg",
     "https://i.pinimg.com/736x/b9/f0/38/b9f038fd9134e960488ba976fb172a92.jpg",
     "https://i.pinimg.com/736x/49/49/11/4949114018c15a5e6fa2067e94e266a1.jpg",
     "https://i.pinimg.com/736x/68/9f/53/689f531d57dd0f4630e5ad26fbfc5b9c.jpg",

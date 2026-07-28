@@ -12,6 +12,51 @@ interface WishCardProps {
   index: number;
 }
 
+const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
+  return (
+    <video 
+      src={url} 
+      poster={poster}
+      controls
+      playsInline
+      preload="metadata"
+      className="w-full h-full object-contain bg-black"
+    />
+  );
+};
+
+const renderVideoUrl = (url: string, poster?: string) => {
+  const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    return (
+      <iframe 
+        className="w-full h-full"
+        src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    );
+  }
+
+  const vimeoMatch = url.match(/vimeo\.com\/(?:.*#|.*\/videos\/)?([0-9]+)/i);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return (
+      <iframe 
+        className="w-full h-full"
+        src={`https://player.vimeo.com/video/${vimeoMatch[1]}`}
+        title="Vimeo video player"
+        frameBorder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    );
+  }
+
+  return <VideoPlayer url={url} poster={poster} />;
+};
+
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
@@ -45,7 +90,6 @@ export default React.memo(function WishCard({ post, index }: WishCardProps) {
       variants={itemVariants}
       initial="hidden"
       animate="visible"
-      layoutId={post.id}
       className="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-luxury-gold/20 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow duration-300 flex flex-col h-full relative group"
     >
       <div className="flex items-center gap-4 mb-4">
@@ -65,15 +109,10 @@ export default React.memo(function WishCard({ post, index }: WishCardProps) {
       </div>
       
       {post.type === 'video' && post.videoUrl ? (
-        <div className="mb-4 relative rounded-xl overflow-hidden bg-black/5 aspect-[4/5] sm:aspect-[9/16] lg:aspect-[4/5]">
-          <video 
-            ref={videoRef}
-            src={post.videoUrl} 
-            poster={post.thumbnailUrl}
-            controls
-            preload="metadata"
-            className="w-full h-full object-cover"
-          />
+        <div className="mb-4 relative rounded-xl overflow-hidden bg-black/5 aspect-[4/5] sm:aspect-[9/16] lg:aspect-[4/5] flex flex-col">
+          <div className="flex-1 w-full relative">
+            {renderVideoUrl(post.videoUrl, post.thumbnailUrl)}
+          </div>
           {post.caption && (
             <p className="font-sans text-sm mt-3 text-elegant-black/80">{post.caption}</p>
           )}
@@ -81,7 +120,7 @@ export default React.memo(function WishCard({ post, index }: WishCardProps) {
       ) : (
         <div className="relative mb-6 flex-grow">
           <Quote className="w-6 h-6 text-luxury-gold/10 absolute -top-2 -left-2" />
-          <p className="font-serif text-lg leading-relaxed text-elegant-black/80 whitespace-pre-wrap pl-4">
+          <p className="font-cormorant text-lg leading-relaxed text-elegant-black/80 whitespace-pre-wrap pl-4">
             "{post.message}"
           </p>
         </div>

@@ -14,6 +14,7 @@ export const wishPostSchema = z.object({
   country: z.string().min(1, "Country is required.").max(100, "Country cannot exceed 100 characters.").trim(),
   message: z.string().max(2000, "Message cannot exceed 2000 characters.").optional(),
   caption: z.string().max(500, "Caption cannot exceed 500 characters.").optional(),
+  videoUrl: z.string().url("Must be a valid URL").max(1000, "URL is too long").optional().or(z.literal('')),
 }).refine(data => {
   if (data.type === 'text') {
     return !!data.message && data.message.trim().length >= 5;

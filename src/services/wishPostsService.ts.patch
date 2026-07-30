@@ -1,0 +1,11 @@
+--- src/services/wishPostsService.ts
++++ src/services/wishPostsService.ts
+@@ -136,7 +136,7 @@
+             publicId: response.publicId
+           });
+         } catch (error) {
+-          reject(new Error("Failed to parse upload response"));
++          reject(new Error(`Failed to parse upload response (Status: ${xhr.status}): ${xhr.responseText.substring(0, 100)}`));
+         }
+       } else {
+         try {

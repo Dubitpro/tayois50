@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 
-// Define a simplified User type for our app
 export interface AppUser {
   uid: string;
   isAnonymous: boolean;

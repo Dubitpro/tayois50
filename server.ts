@@ -1,13 +1,63 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import { v2 as cloudinary } from "cloudinary";
+import multer from "multer";
+
+// Configure Cloudinary if URL is provided
+if (process.env.CLOUDINARY_URL) {
+  cloudinary.config({
+    secure: true
+  });
+}
+
+const upload = multer({ 
+  dest: "/tmp/uploads/",
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100 MB max
+  }
+});
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
+
+  // API Route: Get Cloudinary Signature for client-side upload
+  app.get("/api/cloudinary-signature", (req, res) => {
+    try {
+      if (!process.env.CLOUDINARY_URL) {
+        return res.status(500).json({ error: "Cloudinary is not configured." });
+      }
+      
+      const timestamp = Math.round((new Date).getTime() / 1000);
+      const folder = "wish-wall/videos";
+      
+      const paramsToSign = {
+        timestamp: timestamp,
+        folder: folder
+      };
+      
+      const signature = cloudinary.utils.api_sign_request(
+        paramsToSign, 
+        cloudinary.config().api_secret!
+      );
+      
+      res.json({ 
+        timestamp, 
+        signature, 
+        folder,
+        apiKey: cloudinary.config().api_key,
+        cloudName: cloudinary.config().cloud_name
+      });
+    } catch (error: any) {
+      console.error("Cloudinary Signature Error:", error);
+      res.status(500).json({ error: "Failed to generate signature." });
+    }
+  });
 
   // API Route: Generate AI Tribute
   app.post("/api/generate-tribute", async (req, res) => {

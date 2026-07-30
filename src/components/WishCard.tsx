@@ -42,6 +42,7 @@ const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
     <div className="relative w-full h-full cursor-pointer group" onClick={togglePlay}>
       <video 
         ref={videoRef}
+        src={url}
         poster={poster}
         controls
         playsInline
@@ -50,9 +51,7 @@ const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)}
-      >
-        <source src={url} type="video/mp4" />
-      </video>
+      />
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
           <div className="w-12 h-12 rounded-full bg-luxury-gold/90 flex items-center justify-center text-white backdrop-blur-sm transform group-hover:scale-110 transition-transform pointer-events-none">

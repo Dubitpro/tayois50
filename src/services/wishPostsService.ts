@@ -1,6 +1,5 @@
 import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs, where, startAfter, DocumentData, QueryDocumentSnapshot, updateDoc, doc, increment } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase/config';
+import { db } from '../firebase/config';
 
 export const POSTS_COLLECTION = 'wishPosts';
 
@@ -14,6 +13,7 @@ export interface WishPost {
   message?: string;
   caption?: string;
   videoUrl?: string;
+  publicId?: string;
   thumbnailUrl?: string;
   duration?: number;
   createdAt: any;
@@ -81,6 +81,7 @@ export const submitWishPost = async (
     message?: string; 
     caption?: string; 
     videoUrl?: string; 
+    publicId?: string;
     thumbnailUrl?: string;
     duration?: number;
   }, 
@@ -112,47 +113,70 @@ export const uploadVideo = async (
   file: File,
   userId: string,
   onProgress: (progress: number) => void
-): Promise<string> => {
+): Promise<{ secureUrl: string; publicId: string }> => {
+  // First, get the signature from our backend
+  const sigResponse = await fetch('/api/cloudinary-signature');
+  if (!sigResponse.ok) {
+    throw new Error('Failed to get upload signature');
+  }
+  const sigData = await sigResponse.json();
+  
+  if (sigData.error) {
+    throw new Error(sigData.error);
+  }
+
+  const { signature, timestamp, folder, apiKey, cloudName } = sigData;
+
   return new Promise((resolve, reject) => {
-    // Generate unique filename: wish-wall/videos/{timestamp}-{random}-{originalFilename}
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 8);
-    const safeFilename = file.name ? file.name.replace(/[^a-zA-Z0-9.-]/g, '_') : 'upload.mp4';
-    const filePath = `wish-wall/videos/${timestamp}-${random}-${safeFilename}`;
+    const xhr = new XMLHttpRequest();
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`;
     
-    const storageRef = ref(storage, filePath);
+    xhr.open("POST", url, true);
     
-    // Create the file metadata
-    const metadata = {
-      contentType: file.type,
-      customMetadata: {
-        userId: userId
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const progress = (event.loaded / event.total) * 100;
+        onProgress(progress);
       }
     };
     
-    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
-    
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        // Observe state change events such as progress, pause, and resume
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        onProgress(progress);
-      },
-      (error) => {
-        // Handle unsuccessful uploads
-        reject(new Error(`Upload failed: ${error.message}`));
-      },
-      async () => {
-        // Handle successful uploads on complete
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
         try {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          resolve(downloadURL);
-        } catch (error: any) {
-          reject(new Error(`Failed to get download URL: ${error.message}`));
+          const response = JSON.parse(xhr.responseText);
+          resolve({
+            secureUrl: response.secure_url,
+            publicId: response.public_id
+          });
+        } catch (error) {
+          reject(new Error(`Failed to parse upload response (Status: ${xhr.status}): ${xhr.responseText.substring(0, 100)}`));
+        }
+      } else {
+        try {
+          const response = JSON.parse(xhr.responseText);
+          reject(new Error(response.error?.message || "Upload failed"));
+        } catch (e) {
+          reject(new Error(`Upload failed with status ${xhr.status}`));
         }
       }
-    );
+    };
+    
+    xhr.onerror = () => {
+      reject(new Error("Network error during upload"));
+    };
+    
+    xhr.onabort = () => {
+      reject(new Error("Upload aborted"));
+    };
+    
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", apiKey);
+    formData.append("timestamp", timestamp.toString());
+    formData.append("signature", signature);
+    formData.append("folder", folder);
+    
+    xhr.send(formData);
   });
 };
 
@@ -160,11 +184,9 @@ export const uploadThumbnail = async (
   file: File | Blob,
   userId: string
 ): Promise<string> => {
-  const fileName = `${userId}_${Date.now()}_thumb.jpg`;
-  const storageRef = ref(storage, `wish-thumbnails/${userId}/${fileName}`);
-  const uploadTask = uploadBytesResumable(storageRef, file);
-  await uploadTask;
-  return getDownloadURL(storageRef);
+  // Not used anymore if Cloudinary generates thumbnails automatically,
+  // but kept for compatibility.
+  return "";
 };
 
 export const togglePostReaction = async (postId: string, reactionType: 'likes' | 'hearts', currentUserId: string) => {

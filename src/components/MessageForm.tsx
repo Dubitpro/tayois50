@@ -70,16 +70,20 @@ export default function MessageForm() {
 
     try {
       let videoUrl = '';
+      let publicId = '';
       if (postType === 'video' && videoFile) {
-        videoUrl = await uploadVideo(videoFile, user.uid, (progress) => {
+        const result = await uploadVideo(videoFile, user.uid, (progress) => {
           setUploadProgress(progress);
         });
+        videoUrl = result.secureUrl;
+        publicId = result.publicId;
       }
 
       await submitWishPost({
         ...data,
         type: postType,
         videoUrl: videoUrl || undefined,
+        publicId: publicId || undefined,
       }, user.uid);
       
       setSubmitSuccess(true);
@@ -93,7 +97,9 @@ export default function MessageForm() {
       }, 5000);
     } catch (error: any) {
       console.error("Submission error:", error);
-      setSubmitError(error.message || "Failed to submit post. Please try again.");
+      let errorMessage = error.message || "Failed to submit post. Please try again.";
+      
+      setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

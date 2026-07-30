@@ -114,22 +114,9 @@ export const uploadVideo = async (
   userId: string,
   onProgress: (progress: number) => void
 ): Promise<{ secureUrl: string; publicId: string }> => {
-  // First, get the signature from our backend
-  const sigResponse = await fetch('/api/cloudinary-signature');
-  if (!sigResponse.ok) {
-    throw new Error('Failed to get upload signature');
-  }
-  const sigData = await sigResponse.json();
-  
-  if (sigData.error) {
-    throw new Error(sigData.error);
-  }
-
-  const { signature, timestamp, folder, apiKey, cloudName } = sigData;
-
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`;
+    const url = `https://api.cloudinary.com/v1_1/oanujycn/video/upload`;
     
     xhr.open("POST", url, true);
     
@@ -171,10 +158,7 @@ export const uploadVideo = async (
     
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("api_key", apiKey);
-    formData.append("timestamp", timestamp.toString());
-    formData.append("signature", signature);
-    formData.append("folder", folder);
+    formData.append("upload_preset", "wishwallvideos");
     
     xhr.send(formData);
   });

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SEO from '../components/SEO';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { subscribeToGallery, GalleryImage } from '../services/galleryService';
 
 const defaultImages = [
   "https://i.pinimg.com/originals/0b/5f/13/0b5f13ee309e4aa2e9b3d7d864a235d0.jpg",
@@ -24,17 +25,16 @@ export default function Gallery() {
   const [images, setImages] = useState<string[]>(defaultImages);
 
   useEffect(() => {
-    fetch('/api/config')
-      .then(res => res.json())
-      .then(data => {
-        if (data.galleryImages && data.galleryImages.length > 0) {
-          const filteredImages = data.galleryImages.filter((img: string) => 
-            !["/1.jpg", "/2.jpg", "/3.jpg", "/4.jpg"].includes(img)
-          );
-          setImages(filteredImages.length > 0 ? filteredImages : defaultImages);
-        }
-      })
-      .catch(console.error);
+    const unsubscribe = subscribeToGallery((data) => {
+      // Filter out hidden images
+      const visible = data.filter(img => !img.isHidden);
+      if (visible.length > 0) {
+        setImages(visible.map(img => img.url));
+      } else {
+        setImages(defaultImages);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   return (

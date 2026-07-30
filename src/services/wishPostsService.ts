@@ -24,7 +24,8 @@ export interface WishPost {
   shares: number;
   views: number;
   anonymousId: string;
-  status: 'approved' | 'pending' | 'rejected';
+  status: 'approved' | 'pending' | 'rejected' | 'hidden';
+  isPinned?: boolean;
 }
 
 export const getWishPostsQuery = (pageSize: number, lastDoc: QueryDocumentSnapshot<DocumentData> | null, filterBy: string) => {

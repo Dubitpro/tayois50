@@ -24,12 +24,12 @@ async function startServer() {
       if (!process.env.CLOUDINARY_URL) {
         return res.status(500).json({ error: "Cloudinary is not configured." });
       }
-      const { publicId } = req.body;
+      const { publicId, type } = req.body;
       if (!publicId) {
         return res.status(400).json({ error: "Missing publicId" });
       }
 
-      await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+      await cloudinary.uploader.destroy(publicId, { resource_type: type === 'image' ? 'image' : 'video' });
       res.json({ success: true });
     } catch (error: any) {
       console.error("Cloudinary Delete Error:", error);

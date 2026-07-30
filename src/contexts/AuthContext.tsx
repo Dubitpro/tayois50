@@ -18,19 +18,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isFirebaseConfigured) {
-      const isMockLoggedIn = localStorage.getItem('mockAdminLoggedIn') === 'true';
-      if (isMockLoggedIn) {
-        setCurrentUser({ email: 'admin@palace.com', uid: 'mock-admin' });
-      } else {
-        setCurrentUser(null);
-      }
+    const isMockLoggedIn = localStorage.getItem('mockAdminLoggedIn') === 'true';
+    if (isMockLoggedIn) {
+      setCurrentUser({ email: 'admin@palace.com', uid: 'mock-admin' });
       setLoading(false);
+    }
+
+    if (!isFirebaseConfigured) {
+      if (!isMockLoggedIn) {
+        setCurrentUser(null);
+        setLoading(false);
+      }
       return () => {};
     }
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        if (localStorage.getItem('mockAdminLoggedIn') !== 'true') {
+          setCurrentUser(null);
+        }
+      }
       setLoading(false);
     });
 

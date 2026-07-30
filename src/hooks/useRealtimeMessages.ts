@@ -40,7 +40,10 @@ export const useRealtimeMessages = (pageSize: number = 20) => {
       (snapshot) => {
         const newMessages: WishPost[] = [];
         snapshot.forEach((doc) => {
-          newMessages.push({ id: doc.id, ...doc.data() } as WishPost);
+          const data = doc.data();
+          if (data.status !== 'hidden') {
+            newMessages.push({ id: doc.id, ...data } as WishPost);
+          }
         });
         
         setMessages(newMessages);
@@ -66,6 +69,10 @@ export const useRealtimeMessages = (pageSize: number = 20) => {
       (msg.message && msg.message.toLowerCase().includes(lowerQuery)) ||
       (msg.caption && msg.caption.toLowerCase().includes(lowerQuery))
     );
+  }).sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return 0;
   });
 
   return { 

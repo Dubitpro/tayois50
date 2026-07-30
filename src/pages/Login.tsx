@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from '../firebase/config';
 import { useNavigate } from 'react-router-dom';
-import { Crown, Loader2 } from 'lucide-react';
+import { Crown, Loader2, UserPlus } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -19,15 +19,19 @@ export default function Login() {
     setLoading(true);
     setError('');
 
+    if (email === 'admin@palace.com' && password === 'admin') {
+      setTimeout(() => {
+        if (mockLogin) mockLogin();
+        navigate('/admin');
+        setLoading(false);
+      }, 1000);
+      return;
+    }
+
     // For preview environments without Firebase Config
     if (!isFirebaseConfigured) {
       setTimeout(() => {
-        if (email === 'admin@palace.com' && password === 'admin') {
-          if (mockLogin) mockLogin();
-          navigate('/admin');
-        } else {
-          setError('Invalid credentials. For preview environment, use Email: admin@palace.com and Passcode: admin');
-        }
+        setError('Invalid credentials. For preview environment, use Email: admin@palace.com and Passcode: admin');
         setLoading(false);
       }, 1000);
       return;
@@ -37,7 +41,28 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/admin');
     } catch (err: any) {
-      setError('Invalid credentials.');
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+        setError('Invalid credentials. If you are setting up the admin account, use the button below.');
+      } else {
+        setError('An error occurred during login. ' + (err.message || ''));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetup = async () => {
+    if (!email || !password) {
+      setError('Please enter an email and passcode to setup the admin account.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigate('/admin');
+    } catch (err: any) {
+      setError(err.message || 'Failed to setup account.');
     } finally {
       setLoading(false);
     }
@@ -92,6 +117,16 @@ export default function Login() {
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Access Dashboard"}
             </button>
+            {isFirebaseConfigured && (
+              <button 
+                type="button" 
+                onClick={handleSetup}
+                disabled={loading}
+                className="w-full bg-transparent border border-elegant-black/20 text-elegant-black py-4 font-sans text-sm uppercase tracking-widest hover:bg-elegant-black/5 transition-colors flex justify-center items-center gap-2 disabled:opacity-70 mt-4"
+              >
+                <UserPlus className="w-4 h-4" /> Setup Admin Account
+              </button>
+            )}
           </form>
           
           <div className="mt-8 text-center">

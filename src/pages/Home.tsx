@@ -21,21 +21,23 @@ const calculateTimeLeft = (targetDate: string = "2026-08-09T00:00:00") => {
   return timeLeft;
 };
 
+import { subscribeToConfig, FrontendConfigData } from '../services/configService';
+
 export default function Home() {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 1000], [0, 300]);
   
-  const [config, setConfig] = useState<any>(null);
+  const [config, setConfig] = useState<FrontendConfigData | null>(null);
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
-    fetch('/api/config')
-      .then(res => res.json())
-      .then(data => {
-        setConfig(data);
+    const unsubscribe = subscribeToConfig((data) => {
+      setConfig(data);
+      if (data.countdownDate) {
         setTimeLeft(calculateTimeLeft(data.countdownDate));
-      })
-      .catch(console.error);
+      }
+    });
+    return () => unsubscribe();
   }, []);
   
   // Hero Images State
@@ -48,7 +50,7 @@ export default function Home() {
     "https://i.pinimg.com/originals/3e/a4/8c/3ea48cf9823f9e95a18c1787fa955f38.jpg"
   ];
 
-  const sliderImages = [
+  const defaultSlider = [
     "https://i.pinimg.com/736x/52/81/2f/52812fdad4390e7e95c8509f91421644.jpg",
     "https://i.pinimg.com/736x/c6/e6/2b/c6e62b69ce27ce96c9af48d3d256441d.jpg",
     "https://i.pinimg.com/736x/db/ab/b1/dbabb170e17873422934ac3831359853.jpg",
@@ -56,6 +58,20 @@ export default function Home() {
     "https://i.pinimg.com/736x/23/d9/99/23d999fa8581fbbca9712f42eb172d60.jpg",
     "https://i.pinimg.com/736x/73/c1/06/73c10644ca72c6454f5a43de93756ef5.jpg"
   ];
+  const [sliderImages, setSliderImages] = useState<string[]>(defaultSlider);
+
+  useEffect(() => {
+    import('../services/galleryService').then(({ subscribeToGallery }) => {
+      return subscribeToGallery((data) => {
+        const visible = data.filter(img => !img.isHidden);
+        if (visible.length > 0) {
+          setSliderImages(visible.map(img => img.url).slice(0, 10)); // Take up to 10 for slider
+        } else {
+          setSliderImages(defaultSlider);
+        }
+      });
+    });
+  }, []);
 
   const mobileHeroImages = [
     "https://i.pinimg.com/736x/fb/f1/43/fbf14334f94186ecd1077639da4c768c.jpg",

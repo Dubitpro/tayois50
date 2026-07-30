@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Loader2 } from 'lucide-react';
+import { FrontendConfigData, getConfig, saveConfig } from '../../services/configService';
 
 export default function FrontendConfig() {
-  const [config, setConfig] = useState<any>(null);
+  const [config, setConfig] = useState<FrontendConfigData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetch('/api/config')
-      .then(res => res.json())
+    getConfig()
       .then(data => {
         setConfig(data);
         setLoading(false);
@@ -20,15 +20,10 @@ export default function FrontendConfig() {
   }, []);
 
   const handleSave = async () => {
+    if (!config) return;
     setSaving(true);
     try {
-      await fetch('/api/config', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(config)
-      });
+      await saveConfig(config);
       alert('Configuration saved successfully!');
     } catch (error) {
       console.error(error);
@@ -39,22 +34,26 @@ export default function FrontendConfig() {
   };
 
   const handleCaptionChange = (index: number, value: string) => {
+    if (!config) return;
     const newCaptions = [...config.heroCaptions];
     newCaptions[index] = value;
     setConfig({ ...config, heroCaptions: newCaptions });
   };
 
   const handleGalleryImageChange = (index: number, value: string) => {
+    if (!config) return;
     const newImages = [...(config.galleryImages || [])];
     newImages[index] = value;
     setConfig({ ...config, galleryImages: newImages });
   };
 
   const handleAddGalleryImage = () => {
+    if (!config) return;
     setConfig({ ...config, galleryImages: [...(config.galleryImages || []), ""] });
   };
 
   const handleRemoveGalleryImage = (index: number) => {
+    if (!config) return;
     const newImages = [...(config.galleryImages || [])];
     newImages.splice(index, 1);
     setConfig({ ...config, galleryImages: newImages });
@@ -127,34 +126,6 @@ export default function FrontendConfig() {
           ))}
         </div>
 
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="block font-sans text-xs uppercase tracking-widest text-elegant-black/70">Gallery Images (URLs)</label>
-            <button 
-              onClick={handleAddGalleryImage}
-              className="text-xs font-sans uppercase tracking-widest text-luxury-gold hover:underline"
-            >
-              + Add Image
-            </button>
-          </div>
-          {config.galleryImages?.map((url: string, idx: number) => (
-            <div key={idx} className="mb-3 flex gap-2 items-center">
-              <span className="font-sans text-xs text-elegant-black/50 py-3">{idx + 1}.</span>
-              <input 
-                type="text" 
-                value={url} 
-                onChange={(e) => handleGalleryImageChange(idx, e.target.value)}
-                className="w-full bg-transparent border-b border-luxury-gold/30 focus:border-luxury-gold outline-none py-2 font-sans text-sm text-elegant-black"
-              />
-              <button 
-                onClick={() => handleRemoveGalleryImage(idx)}
-                className="text-red-500 hover:text-red-700 text-xl px-2"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

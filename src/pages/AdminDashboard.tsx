@@ -1,17 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { collection, query, getDocs, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../firebase/config';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { Crown, LogOut, Image, BookOpen, Settings, Users, LayoutDashboard } from 'lucide-react';
+import { Crown, LogOut, Image, BookOpen, Settings, Users, LayoutDashboard, Video } from 'lucide-react';
 import FrontendConfig from '../components/admin/FrontendConfig';
+import WishesManagement from '../components/admin/WishesManagement';
+import GalleryManagement from '../components/admin/GalleryManagement';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const { mockLogout } = useAuth();
+  const [stats, setStats] = useState({ totalGuests: 0, pendingWishes: 0, videos: 0 });
+
+  useEffect(() => {
+    // Simple realtime stats for dashboard overview
+    const q = query(collection(db, 'wishPosts'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let videos = 0;
+      let text = 0;
+      snapshot.forEach(doc => {
+        if (doc.data().type === 'video') videos++;
+        else text++;
+      });
+      setStats({
+        totalGuests: snapshot.size,
+        pendingWishes: 0,
+        videos
+      });
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    if (mockLogout) mockLogout();
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.error(e);
+    }
     navigate('/');
   };
 
@@ -46,18 +76,19 @@ export default function AdminDashboard() {
                 </button>
               </li>
               <li>
-                <button className="w-full flex items-center gap-3 px-4 py-3 text-pearl-white/70 hover:text-luxury-gold hover:bg-luxury-gold/5 rounded transition-colors font-sans text-sm tracking-widest uppercase">
-                  <BookOpen size={18} /> Message of Love
+                <button 
+                  onClick={() => setActiveTab('wishes')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded font-sans text-sm tracking-widest uppercase transition-colors ${activeTab === 'wishes' ? 'bg-luxury-gold/10 text-luxury-gold' : 'text-pearl-white/70 hover:text-luxury-gold hover:bg-luxury-gold/5'}`}
+                >
+                  <Users size={18} /> Wishes & Messages
                 </button>
               </li>
               <li>
-                <button className="w-full flex items-center gap-3 px-4 py-3 text-pearl-white/70 hover:text-luxury-gold hover:bg-luxury-gold/5 rounded transition-colors font-sans text-sm tracking-widest uppercase">
+                <button 
+                  onClick={() => setActiveTab('gallery')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded font-sans text-sm tracking-widest uppercase transition-colors ${activeTab === 'gallery' ? 'bg-luxury-gold/10 text-luxury-gold' : 'text-pearl-white/70 hover:text-luxury-gold hover:bg-luxury-gold/5'}`}
+                >
                   <Image size={18} /> Gallery
-                </button>
-              </li>
-              <li>
-                <button className="w-full flex items-center gap-3 px-4 py-3 text-pearl-white/70 hover:text-luxury-gold hover:bg-luxury-gold/5 rounded transition-colors font-sans text-sm tracking-widest uppercase">
-                  <Users size={18} /> Wishes
                 </button>
               </li>
             </ul>
@@ -104,30 +135,33 @@ export default function AdminDashboard() {
                 <p className="font-sans text-elegant-black/60 mb-10">Manage the Golden Jubilee celebrations and content.</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                   <div className="bg-pearl-white p-6 border border-luxury-gold/20 shadow-sm">
-                    <h3 className="font-sans text-xs uppercase tracking-widest text-elegant-black/50 mb-2">Total Guests</h3>
-                    <p className="font-cormorant text-4xl text-elegant-black">1,248</p>
+                    <h3 className="font-sans text-xs uppercase tracking-widest text-elegant-black/50 mb-2">Total Wishes</h3>
+                    <p className="font-cormorant text-4xl text-elegant-black">{stats.totalGuests}</p>
                   </div>
                   <div className="bg-pearl-white p-6 border border-luxury-gold/20 shadow-sm">
-                    <h3 className="font-sans text-xs uppercase tracking-widest text-elegant-black/50 mb-2">Pending Wishes</h3>
-                    <p className="font-cormorant text-4xl text-elegant-black">42</p>
+                    <h3 className="font-sans text-xs uppercase tracking-widest text-elegant-black/50 mb-2">Video Messages</h3>
+                    <p className="font-cormorant text-4xl text-elegant-black">{stats.videos}</p>
                   </div>
                   <div className="bg-pearl-white p-6 border border-luxury-gold/20 shadow-sm">
                     <h3 className="font-sans text-xs uppercase tracking-widest text-elegant-black/50 mb-2">Gallery Assets</h3>
-                    <p className="font-cormorant text-4xl text-elegant-black">156</p>
+                    <p className="font-cormorant text-4xl text-elegant-black">Managed in Config</p>
                   </div>
                 </div>
                 <div className="bg-pearl-white border border-luxury-gold/20 shadow-sm rounded overflow-hidden">
                   <div className="p-6 border-b border-luxury-gold/10 flex justify-between items-center">
-                    <h2 className="font-cormorant text-2xl text-elegant-black">Recent Messages of Love</h2>
-                    <button className="text-xs font-sans uppercase tracking-widest text-luxury-gold hover:underline">View All</button>
+                    <h2 className="font-cormorant text-2xl text-elegant-black">Welcome</h2>
                   </div>
                   <div className="p-6">
-                    <p className="text-sm text-elegant-black/60 italic font-serif">Awaiting Firebase connection to load real-time signatures...</p>
+                    <p className="text-sm text-elegant-black/60 italic font-serif">Go to Wishes & Messages to manage posts.</p>
                   </div>
                 </div>
               </>
             ) : activeTab === 'frontend' ? (
               <FrontendConfig />
+            ) : activeTab === 'wishes' ? (
+              <WishesManagement />
+            ) : activeTab === 'gallery' ? (
+              <GalleryManagement />
             ) : null}
           </div>
         </main>

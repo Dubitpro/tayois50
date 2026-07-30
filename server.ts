@@ -4,7 +4,6 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { v2 as cloudinary } from "cloudinary";
-import multer from "multer";
 
 // Configure Cloudinary if URL is provided
 if (process.env.CLOUDINARY_URL) {
@@ -13,18 +12,30 @@ if (process.env.CLOUDINARY_URL) {
   });
 }
 
-const upload = multer({ 
-  dest: "/tmp/uploads/",
-  limits: {
-    fileSize: 100 * 1024 * 1024, // 100 MB max
-  }
-});
-
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
+
+  // API Route: Delete Cloudinary Video
+  app.post("/api/delete-video", async (req, res) => {
+    try {
+      if (!process.env.CLOUDINARY_URL) {
+        return res.status(500).json({ error: "Cloudinary is not configured." });
+      }
+      const { publicId } = req.body;
+      if (!publicId) {
+        return res.status(400).json({ error: "Missing publicId" });
+      }
+
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Cloudinary Delete Error:", error);
+      res.status(500).json({ error: "Failed to delete video." });
+    }
+  });
 
   // API Route: Get Cloudinary Signature for client-side upload
   app.get("/api/cloudinary-signature", (req, res) => {

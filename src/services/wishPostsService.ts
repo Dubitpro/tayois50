@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs, where, startAfter, DocumentData, QueryDocumentSnapshot, updateDoc, doc, increment } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs, where, startAfter, DocumentData, QueryDocumentSnapshot, updateDoc, doc, increment, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 export const POSTS_COLLECTION = 'wishPosts';
@@ -201,6 +201,21 @@ export const togglePostReaction = async (postId: string, reactionType: 'likes' |
   });
   
   localStorage.setItem(storageKey, 'true');
+};
+
+export const deletePost = async (postId: string, publicId?: string) => {
+  if (publicId) {
+    try {
+      await fetch('/api/delete-video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicId })
+      });
+    } catch (error) {
+      console.error('Failed to delete video from Cloudinary', error);
+    }
+  }
+  await deleteDoc(doc(db, POSTS_COLLECTION, postId));
 };
 
 export const incrementViewCount = async (postId: string) => {

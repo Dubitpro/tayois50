@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Quote, Play, Pause } from 'lucide-react';
-import { WishPost, incrementViewCount } from '../services/wishPostsService';
+import { Quote, Play, Pause, Trash2 } from 'lucide-react';
+import { WishPost, incrementViewCount, deletePost } from '../services/wishPostsService';
 import { timeAgo } from '../utils/timeAgo';
 import ReactionBar from './ReactionBar';
 import { useAuth } from '../hooks/useAuth';
@@ -15,15 +15,6 @@ interface WishCardProps {
 const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  
-  if (url && url.startsWith('/uploads/')) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-black/10 rounded-xl">
-        <p className="text-elegant-black/60 font-medium">Video unavailable</p>
-        <p className="text-xs text-elegant-black/40 mt-1">This video is no longer accessible.</p>
-      </div>
-    );
-  }
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -120,7 +111,22 @@ export default React.memo(function WishCard({ post, index }: WishCardProps) {
     }
   }, [post.id]);
 
-  // Lazy loading video handling could be added here via IntersectionObserver on videoRef
+  const isAdmin = user?.uid === 'mock-admin' || user?.email === 'admin@palace.com';
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this wish?')) {
+      setIsDeleting(true);
+      try {
+        await deletePost(post.id!, post.publicId);
+      } catch (error) {
+        console.error('Error deleting post:', error);
+        alert('Failed to delete post.');
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
 
   return (
     <motion.div
@@ -130,6 +136,16 @@ export default React.memo(function WishCard({ post, index }: WishCardProps) {
       animate="visible"
       className="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-luxury-gold/20 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow duration-300 flex flex-col h-full relative group"
     >
+      {isAdmin && (
+        <button 
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="absolute top-4 right-4 text-red-500 hover:text-red-700 bg-white/50 hover:bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-sm"
+          title="Delete Post"
+        >
+          <Trash2 size={16} />
+        </button>
+      )}
       <div className="flex items-center gap-4 mb-4">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-luxury-gold to-[#A67C00] flex items-center justify-center text-white font-cormorant text-lg shadow-sm shrink-0">
           {post.fullName.charAt(0).toUpperCase()}

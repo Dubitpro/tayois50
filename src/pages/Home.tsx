@@ -56,7 +56,17 @@ export default function Home() {
     "https://i.pinimg.com/736x/db/ab/b1/dbabb170e17873422934ac3831359853.jpg",
     "https://i.pinimg.com/736x/88/a9/53/88a95334b962aeff0763c7b9566dd502.jpg",
     "https://i.pinimg.com/736x/23/d9/99/23d999fa8581fbbca9712f42eb172d60.jpg",
-    "https://i.pinimg.com/736x/73/c1/06/73c10644ca72c6454f5a43de93756ef5.jpg"
+    "https://i.pinimg.com/736x/73/c1/06/73c10644ca72c6454f5a43de93756ef5.jpg",
+    "https://i.pinimg.com/originals/e6/3a/e2/e63ae201dee0607bedc41da746e3cfab.jpg",
+    "https://i.pinimg.com/originals/05/4f/68/054f6856f1a2cd9c9099e99fed2a2643.jpg",
+    "https://i.pinimg.com/originals/e4/ee/b4/e4eeb4aaf87caffc5677632f326400fe.jpg",
+    "https://i.pinimg.com/originals/2d/b0/db/2db0db168bf113048ec85c380c244edb.jpg",
+    "https://i.pinimg.com/originals/be/c5/e3/bec5e3614a387e2e623ebc7436d289f5.jpg",
+    "https://i.pinimg.com/originals/72/d4/15/72d415630434855e1f59d04b9a7c0352.jpg",
+    "https://i.pinimg.com/originals/55/c4/62/55c462ee2c5499061f68e3f3e80b766a.jpg",
+    "https://i.pinimg.com/originals/b3/07/38/b3073822382ff25e7e606e5b22d21edf.jpg",
+    "https://i.pinimg.com/originals/88/2e/18/882e18fa143fd7ce09f93326a4bd41a6.jpg",
+    "https://i.pinimg.com/originals/a7/76/e4/a776e4ea303eb2745e03700687a6959a.jpg"
   ];
   const [sliderImages, setSliderImages] = useState<string[]>(defaultSlider);
 
@@ -65,7 +75,8 @@ export default function Home() {
       return subscribeToGallery((data) => {
         const visible = data.filter(img => !img.isHidden);
         if (visible.length > 0) {
-          setSliderImages(visible.map(img => img.url).slice(0, 10)); // Take up to 10 for slider
+          const fetchedUrls = visible.map(img => img.url);
+          setSliderImages([...defaultSlider, ...fetchedUrls]); // Combine them
         } else {
           setSliderImages(defaultSlider);
         }

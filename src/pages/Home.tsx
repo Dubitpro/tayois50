@@ -4,6 +4,7 @@ import SEO from '../components/SEO';
 import { ChevronDown, Sparkles, Clock, PenTool, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
+import CoverflowCarousel from '../components/CoverflowCarousel';
 
 const calculateTimeLeft = (targetDate: string = "2026-08-09T00:00:00") => {
   const difference = +new Date(targetDate) - +new Date();
@@ -66,7 +67,19 @@ export default function Home() {
     "https://i.pinimg.com/originals/55/c4/62/55c462ee2c5499061f68e3f3e80b766a.jpg",
     "https://i.pinimg.com/originals/b3/07/38/b3073822382ff25e7e606e5b22d21edf.jpg",
     "https://i.pinimg.com/originals/88/2e/18/882e18fa143fd7ce09f93326a4bd41a6.jpg",
-    "https://i.pinimg.com/originals/a7/76/e4/a776e4ea303eb2745e03700687a6959a.jpg"
+    "https://i.pinimg.com/originals/a7/76/e4/a776e4ea303eb2745e03700687a6959a.jpg",
+    "https://i.pinimg.com/originals/b5/7f/54/b57f541190abd2765f1448afda9c5c00.jpg",
+    "https://i.pinimg.com/originals/8e/17/b1/8e17b133c8ed9637265e599025d28ce3.jpg",
+    "https://i.pinimg.com/originals/04/4e/ea/044eea5f8c6fc3e6d5f1812b661b9cf2.jpg",
+    "https://i.pinimg.com/originals/6a/8f/f2/6a8ff250990f40558b574db80cae984a.jpg",
+    "https://i.pinimg.com/originals/dd/5e/52/dd5e5267cadc7189577f9130d1396dfb.jpg",
+    "https://i.pinimg.com/originals/b9/d1/12/b9d1125bf43b553a75fe4580f6fa347d.jpg",
+    "https://i.pinimg.com/originals/c5/ae/a2/c5aea29cde2ff992885b0e59d6c13b03.jpg",
+    "https://i.pinimg.com/originals/fb/63/16/fb6316d149b1f406c4b1139111b9f324.jpg",
+    "https://i.pinimg.com/originals/ab/99/e8/ab99e873b1391a1fb8042fa39c9970d7.jpg",
+    "https://i.pinimg.com/originals/e8/6f/0a/e86f0abfaeeaa43b3f83d2c24063eb06.jpg",
+    "https://i.pinimg.com/originals/1a/5a/a4/1a5aa4ddc22128cd7285588ecbc1cc1b.jpg",
+    "https://i.pinimg.com/originals/f7/d5/82/f7d5828e1b613f6b93f5ecd5e345c07b.jpg"
   ];
   const [sliderImages, setSliderImages] = useState<string[]>(defaultSlider);
 
@@ -353,35 +366,9 @@ export default function Home() {
           </p>
         </div>
         
-        {/* Infinite Slider */}
-        <div className="w-full flex relative overflow-hidden group">
-          <motion.div
-            className="flex gap-8 px-4"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{
-              duration: 30,
-              ease: "linear",
-              repeat: Infinity,
-            }}
-            style={{ width: "max-content" }}
-          >
-            {[...sliderImages, ...sliderImages].map((img, idx) => (
-              <div 
-                key={idx} 
-                className="w-[280px] h-[350px] md:w-[350px] md:h-[450px] flex-shrink-0 relative border border-luxury-gold/30 p-2 bg-soft-ivory/10"
-              >
-                <div className="w-full h-full relative overflow-hidden">
-                  <img 
-                    src={img} 
-                    alt="Gallery Memory" 
-                    className="w-full h-full object-cover transform transition-transform duration-700 hover:scale-110"
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            ))}
-          </motion.div>
+        {/* Horizontal 3D Carousel Slider */}
+        <div className="w-full h-[600px] md:h-[700px]">
+          <CoverflowCarousel images={sliderImages} />
         </div>
       </section>
 

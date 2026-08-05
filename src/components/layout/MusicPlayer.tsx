@@ -54,6 +54,23 @@ export default function MusicPlayer() {
       
       if (fetchedTracks.length > 0) {
         setCurrentTrackIndex(prev => Math.min(prev, fetchedTracks.length - 1));
+        
+        setTimeout(() => {
+          if (!autoplayAttempted.current && audioRef.current) {
+            autoplayAttempted.current = true;
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+              playPromise.then(() => {
+                setIsPlaying(true);
+                setAutoplayFailed(false);
+              }).catch(err => {
+                console.error("Initial autoplay prevented by browser:", err);
+                setIsPlaying(false);
+                setAutoplayFailed(true);
+              });
+            }
+          }
+        }, 100);
       }
     }, (err) => {
       console.error("Failed to fetch music", err);
@@ -132,22 +149,7 @@ export default function MusicPlayer() {
   };
 
   const handleCanPlay = () => {
-    if (!autoplayAttempted.current) {
-      autoplayAttempted.current = true;
-      if (audioRef.current) {
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            setIsPlaying(true);
-            setAutoplayFailed(false);
-          }).catch(err => {
-            console.error("Initial autoplay prevented by browser:", err);
-            setIsPlaying(false);
-            setAutoplayFailed(true);
-          });
-        }
-      }
-    } else if (isPlaying && audioRef.current) {
+    if (isPlaying && audioRef.current) {
       audioRef.current.play().catch(err => {
         console.error("Autoplay prevented:", err);
         setIsPlaying(false);

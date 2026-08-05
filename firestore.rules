@@ -19,6 +19,14 @@ service cloud.firestore {
       allow update: if true;
       allow delete: if false;
     }
+    
+    match /music/{musicId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+    
     match /{document=**} {
       allow read: if true;
       allow write: if false;

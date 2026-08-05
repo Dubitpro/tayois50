@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, VolumeX, ListMusic, X, Music } from 'lucide-react';
-import { collection, query, orderBy, where, getDocs } from 'firebase/firestore';
+import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, VolumeX, ListMusic, X, Music, Loader2 } from 'lucide-react';
+import { collection, query, orderBy, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { cn } from '../../lib/utils';
 
@@ -14,44 +14,6 @@ interface Track {
   duration?: number;
 }
 
-const FALLBACK_TRACKS: Track[] = [
-  {
-    id: 't1',
-    title: 'Dansaki',
-    artist: 'Lara George',
-    coverImage: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&q=80&w=200',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' // Placeholder: Requires direct .mp3 link
-  },
-  {
-    id: 't2',
-    title: 'Ore Òfé Shá',
-    artist: 'Rotimikeys',
-    coverImage: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&q=80&w=200',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' // Placeholder: Requires direct .mp3 link
-  },
-  {
-    id: 't3',
-    title: 'Gratitude',
-    artist: 'Brandon Lake',
-    coverImage: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&q=80&w=200',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' // Placeholder: Requires direct .mp3 link
-  },
-  {
-    id: 't4',
-    title: "Kos'oba Bi Re",
-    artist: 'Psalmos Ft. Tope Alabi',
-    coverImage: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&q=80&w=200',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' // Placeholder: Requires direct .mp3 link
-  },
-  {
-    id: 't5',
-    title: 'All',
-    artist: 'Chandler Moore',
-    coverImage: 'https://images.unsplash.com/photo-1493225457124-a1a2a5956093?auto=format&fit=crop&q=80&w=200',
-    audioUrl: '/all-chandler-moore.mp3'
-  }
-];
-
 export default function MusicPlayer() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
@@ -63,30 +25,43 @@ export default function MusicPlayer() {
   const [isRepeat, setIsRepeat] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [autoplayFailed, setAutoplayFailed] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const autoplayAttempted = useRef(false);
 
   useEffect(() => {
-    const fetchTracks = async () => {
-      try {
-        const q = query(collection(db, 'playlist'), where('active', '==', true), orderBy('order', 'asc'));
-        const snapshot = await getDocs(q);
-        const fetchedTracks = snapshot.docs.map(doc => ({
+    setLoading(true);
+    const q = query(collection(db, 'music'), where('published', '==', true), orderBy('createdAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedTracks = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
           id: doc.id,
-          ...doc.data()
-        })) as Track[];
-        
-        if (fetchedTracks.length > 0) {
-          setTracks(fetchedTracks);
-        } else {
-          setTracks(FALLBACK_TRACKS);
-        }
-      } catch (err) {
-        console.error("Failed to fetch playlist", err);
-        setTracks(FALLBACK_TRACKS);
+          title: data.title || 'Unknown Title',
+          artist: data.artist || 'Unknown Artist',
+          coverImage: data.coverUrl || 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&q=80&w=200',
+          audioUrl: data.audioUrl || '',
+          duration: data.duration || 0,
+        };
+      }).filter(track => track.audioUrl !== '') as Track[];
+      
+      setTracks(fetchedTracks);
+      setLoading(false);
+      
+      if (fetchedTracks.length > 0) {
+        setCurrentTrackIndex(prev => Math.min(prev, fetchedTracks.length - 1));
       }
-    };
-    fetchTracks();
+    }, (err) => {
+      console.error("Failed to fetch music", err);
+      setError("Failed to load music.");
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -101,7 +76,8 @@ export default function MusicPlayer() {
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      audioRef.current.play().catch(e => console.error("Play prevented", e));
+      setAutoplayFailed(false);
     }
     setIsPlaying(!isPlaying);
   };
@@ -128,26 +104,50 @@ export default function MusicPlayer() {
       setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
     }
     setIsPlaying(true);
+    setAutoplayFailed(false);
   };
 
   const prevTrack = () => {
     setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
     setIsPlaying(true);
+    setAutoplayFailed(false);
   };
 
   const handleEnded = () => {
     if (isRepeat) {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
-        audioRef.current.play();
+        audioRef.current.play().catch(e => console.error("Play prevented", e));
       }
     } else {
       nextTrack();
     }
   };
 
+  const handleError = () => {
+    console.error("Error playing audio track:", tracks[currentTrackIndex]?.audioUrl);
+    if (isPlaying) {
+      nextTrack();
+    }
+  };
+
   const handleCanPlay = () => {
-    if (isPlaying && audioRef.current) {
+    if (!autoplayAttempted.current) {
+      autoplayAttempted.current = true;
+      if (audioRef.current) {
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            setIsPlaying(true);
+            setAutoplayFailed(false);
+          }).catch(err => {
+            console.error("Initial autoplay prevented by browser:", err);
+            setIsPlaying(false);
+            setAutoplayFailed(true);
+          });
+        }
+      }
+    } else if (isPlaying && audioRef.current) {
       audioRef.current.play().catch(err => {
         console.error("Autoplay prevented:", err);
         setIsPlaying(false);
@@ -155,7 +155,24 @@ export default function MusicPlayer() {
     }
   };
 
-  if (tracks.length === 0) return null;
+  if (loading) {
+    return (
+      <div className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 bg-elegant-black/95 rounded-full shadow-2xl border border-luxury-gold/50">
+        <Loader2 className="w-5 h-5 text-luxury-gold animate-spin" />
+      </div>
+    );
+  }
+
+  if (tracks.length === 0) {
+    return (
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="bg-elegant-black/95 backdrop-blur-xl border border-luxury-gold/50 rounded-full shadow-2xl flex items-center px-4 py-2">
+           <Music className="text-luxury-gold/50 w-5 h-5 mr-3" />
+           <p className="text-white/60 text-xs uppercase tracking-wider font-sans">No music available</p>
+        </div>
+      </div>
+    );
+  }
 
   const currentTrack = tracks[currentTrackIndex];
 
@@ -167,6 +184,7 @@ export default function MusicPlayer() {
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleEnded}
         onCanPlay={handleCanPlay}
+        onError={handleError}
       />
       
       <div className="fixed bottom-6 right-6 z-50 flex items-end">
@@ -192,6 +210,7 @@ export default function MusicPlayer() {
                     onClick={() => {
                       setCurrentTrackIndex(idx);
                       setIsPlaying(true);
+                      setAutoplayFailed(false);
                     }}
                     className={cn(
                       "w-full text-left p-3 flex items-center gap-3 transition-colors hover:bg-soft-ivory",
@@ -215,6 +234,25 @@ export default function MusicPlayer() {
                   </button>
                 ))}
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Tap to Play Prompt (Autoplay failed) */}
+        <AnimatePresence>
+          {autoplayFailed && !isPlaying && !isExpanded && (
+            <motion.div
+              initial={{ opacity: 0, x: 20, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 10, scale: 0.9 }}
+              className="absolute right-[115%] bottom-2 bg-luxury-gold text-elegant-black font-sans text-xs font-bold px-4 py-2 rounded-full shadow-lg whitespace-nowrap flex items-center gap-2 cursor-pointer"
+              onClick={() => {
+                 setAutoplayFailed(false);
+                 togglePlay();
+              }}
+            >
+              <span>Tap to Play</span>
+              <Play size={12} className="fill-current" />
             </motion.div>
           )}
         </AnimatePresence>

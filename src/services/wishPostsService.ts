@@ -214,3 +214,39 @@ export const incrementViewCount = async (postId: string) => {
   
   localStorage.setItem(storageKey, 'true');
 };
+
+export interface PostComment {
+  id?: string;
+  postId: string;
+  fullName: string;
+  text: string;
+  createdAt: any;
+  createdAtUnix: number;
+}
+
+export const submitComment = async (postId: string, fullName: string, text: string) => {
+  const newComment: Omit<PostComment, 'id'> = {
+    postId,
+    fullName,
+    text,
+    createdAt: serverTimestamp(),
+    createdAtUnix: Date.now()
+  };
+  
+  await addDoc(collection(db, `${POSTS_COLLECTION}/${postId}/comments`), newComment);
+  
+  const postRef = doc(db, POSTS_COLLECTION, postId);
+  await updateDoc(postRef, {
+    comments: increment(1)
+  });
+};
+
+export const getComments = async (postId: string): Promise<PostComment[]> => {
+  const q = query(
+    collection(db, `${POSTS_COLLECTION}/${postId}/comments`),
+    orderBy('createdAtUnix', 'asc')
+  );
+  
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PostComment));
+};

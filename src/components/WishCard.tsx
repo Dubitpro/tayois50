@@ -14,23 +14,9 @@ interface WishCardProps {
 
 const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const togglePlay = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play().catch(console.error);
-        setIsPlaying(true);
-      } else {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      }
-    }
-  };
 
   return (
-    <div className="relative w-full h-full cursor-pointer group" onClick={togglePlay}>
+    <div className="relative w-full overflow-hidden bg-black rounded-xl">
       <video 
         ref={videoRef}
         src={url}
@@ -38,18 +24,8 @@ const VideoPlayer = ({ url, poster }: { url: string, poster?: string }) => {
         controls
         playsInline
         preload="metadata"
-        className="w-full h-full object-contain bg-black"
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => setIsPlaying(false)}
+        className="w-full h-auto max-h-[75vh] object-contain"
       />
-      {!isPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-          <div className="w-12 h-12 rounded-full bg-luxury-gold/90 flex items-center justify-center text-white backdrop-blur-sm transform group-hover:scale-110 transition-transform pointer-events-none">
-            <Play className="w-6 h-6 ml-1" fill="currentColor" />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -58,28 +34,32 @@ const renderVideoUrl = (url: string, poster?: string) => {
   const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
   if (ytMatch && ytMatch[1]) {
     return (
-      <iframe 
-        className="w-full h-full"
-        src={`https://www.youtube.com/embed/${ytMatch[1]}`}
-        title="YouTube video player"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      ></iframe>
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black">
+        <iframe 
+          className="absolute inset-0 w-full h-full"
+          src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
     );
   }
 
   const vimeoMatch = url.match(/vimeo\.com\/(?:.*#|.*\/videos\/)?([0-9]+)/i);
   if (vimeoMatch && vimeoMatch[1]) {
     return (
-      <iframe 
-        className="w-full h-full"
-        src={`https://player.vimeo.com/video/${vimeoMatch[1]}`}
-        title="Vimeo video player"
-        frameBorder="0"
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowFullScreen
-      ></iframe>
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black">
+        <iframe 
+          className="absolute inset-0 w-full h-full"
+          src={`https://player.vimeo.com/video/${vimeoMatch[1]}`}
+          title="Vimeo video player"
+          frameBorder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
     );
   }
 
@@ -163,16 +143,16 @@ export default React.memo(function WishCard({ post, index }: WishCardProps) {
       </div>
       
       {post.type === 'video' && post.videoUrl ? (
-        <div className="mb-4 relative rounded-xl overflow-hidden bg-black/5 aspect-[4/5] sm:aspect-[9/16] lg:aspect-[4/5] flex flex-col">
-          <div className="flex-1 w-full relative">
+        <div className="mb-4 relative rounded-xl overflow-hidden bg-black/5 flex flex-col">
+          <div className="w-full relative">
             {renderVideoUrl(post.videoUrl, post.thumbnailUrl)}
           </div>
           {post.caption && (
-            <p className="font-sans text-sm mt-3 text-elegant-black/80">{post.caption}</p>
+            <p className="font-sans text-sm mt-3 px-2 pb-2 text-elegant-black/80">{post.caption}</p>
           )}
         </div>
       ) : (
-        <div className="relative mb-6 flex-grow">
+        <div className="relative mb-6">
           <Quote className="w-6 h-6 text-luxury-gold/10 absolute -top-2 -left-2" />
           <p className="font-cormorant text-lg leading-relaxed text-elegant-black/80 whitespace-pre-wrap pl-4">
             "{post.message}"

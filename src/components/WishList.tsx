@@ -70,9 +70,11 @@ export default function WishList() {
               <p className="font-sans text-sm text-luxury-gold uppercase tracking-widest">Be the first person to celebrate.</p>
             </motion.div>
           ) : (
-            <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <motion.div layout className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
               {messages.map((msg, idx) => (
-                <WishCard key={msg.id} post={msg} index={idx % 20} />
+                <div key={msg.id} className="break-inside-avoid">
+                  <WishCard post={msg} index={idx % 20} />
+                </div>
               ))}
             </motion.div>
           )}

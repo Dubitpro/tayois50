@@ -49,11 +49,24 @@ export default function MusicPlayer() {
         };
       }).filter(track => track.audioUrl !== '') as Track[];
       
-      setTracks(fetchedTracks);
+      const sortedTracks: Track[] = [];
+      const firstTrack = fetchedTracks.find(t => t.artist.toLowerCase().includes('rotimi') || t.title.toLowerCase().includes('ore'));
+      const secondTrack = fetchedTracks.find(t => t.title.toLowerCase().includes('dansaki') || t.artist.toLowerCase().includes('lara'));
+      
+      if (firstTrack) sortedTracks.push(firstTrack);
+      if (secondTrack) sortedTracks.push(secondTrack);
+      
+      fetchedTracks.forEach(track => {
+        if (track !== firstTrack && track !== secondTrack) {
+          sortedTracks.push(track);
+        }
+      });
+      
+      setTracks(sortedTracks);
       setLoading(false);
       
-      if (fetchedTracks.length > 0) {
-        setCurrentTrackIndex(prev => Math.min(prev, fetchedTracks.length - 1));
+      if (sortedTracks.length > 0) {
+        setCurrentTrackIndex(prev => Math.min(prev, sortedTracks.length - 1));
         
         setTimeout(() => {
           if (!autoplayAttempted.current && audioRef.current) {

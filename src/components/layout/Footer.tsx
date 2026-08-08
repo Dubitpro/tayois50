@@ -22,7 +22,7 @@ export default function Footer() {
         <div className="w-24 h-[1px] bg-luxury-gold/50 mx-auto mb-8"></div>
         
         <p className="text-xs text-pearl-white/40">
-          &copy; {new Date().getFullYear()} Tayo is 50. All rights reserved. | Developed by Worxflux Tech Solution
+          &copy; {new Date().getFullYear()} Tayo is 50. All rights reserved. | Developed by <a href="https://stevekingportfolio.netlify.app/" target="_blank" rel="noopener noreferrer" className="hover:text-luxury-gold transition-colors">Worxflux Tech Solution</a>
         </p>
       </div>
     </footer>

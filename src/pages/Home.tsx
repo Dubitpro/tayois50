@@ -6,22 +6,6 @@ import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import CoverflowCarousel from '../components/CoverflowCarousel';
 
-const calculateTimeLeft = (targetDate: string = "2026-08-09T00:00:00") => {
-  const difference = +new Date(targetDate) - +new Date();
-  let timeLeft: { [key: string]: number } = {};
-
-  if (difference > 0) {
-    timeLeft = {
-      Days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-      Hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-    };
-  } else {
-    timeLeft = { Days: 0, Hours: 0 };
-  }
-
-  return timeLeft;
-};
-
 import { subscribeToConfig, FrontendConfigData } from '../services/configService';
 
 export default function Home() {
@@ -29,14 +13,10 @@ export default function Home() {
   const heroY = useTransform(scrollY, [0, 1000], [0, 300]);
   
   const [config, setConfig] = useState<FrontendConfigData | null>(null);
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
     const unsubscribe = subscribeToConfig((data) => {
       setConfig(data);
-      if (data.countdownDate) {
-        setTimeLeft(calculateTimeLeft(data.countdownDate));
-      }
     });
     return () => unsubscribe();
   }, []);
@@ -79,7 +59,13 @@ export default function Home() {
     "https://i.pinimg.com/originals/ab/99/e8/ab99e873b1391a1fb8042fa39c9970d7.jpg",
     "https://i.pinimg.com/originals/e8/6f/0a/e86f0abfaeeaa43b3f83d2c24063eb06.jpg",
     "https://i.pinimg.com/originals/1a/5a/a4/1a5aa4ddc22128cd7285588ecbc1cc1b.jpg",
-    "https://i.pinimg.com/originals/f7/d5/82/f7d5828e1b613f6b93f5ecd5e345c07b.jpg"
+    "https://i.pinimg.com/originals/f7/d5/82/f7d5828e1b613f6b93f5ecd5e345c07b.jpg",
+    "https://i.pinimg.com/originals/53/cc/63/53cc6378b717938ecad4b8f06bf3216f.jpg",
+    "https://i.pinimg.com/originals/b2/ef/35/b2ef358e040c51dcb78441e1aadb260f.jpg",
+    "https://i.pinimg.com/originals/5d/bc/20/5dbc20260d13f0ee19a2e61b63978c09.jpg",
+    "https://i.pinimg.com/originals/d7/ab/01/d7ab01384e6771ae486c247e7d7fce60.jpg",
+    "https://i.pinimg.com/originals/69/66/e9/6966e9862dd84acab008a49e10bbc209.jpg",
+    "https://i.pinimg.com/originals/2b/d0/34/2bd034ffc49598087b43bfa61ff95ecb.jpg"
   ];
   const [sliderImages, setSliderImages] = useState<string[]>(defaultSlider);
 
@@ -127,14 +113,6 @@ export default function Home() {
   const [aiTone, setAiTone] = useState('respectful,, and poetic');
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiResult, setAiResult] = useState('');
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft(config?.countdownDate));
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -273,23 +251,6 @@ export default function Home() {
             </AnimatePresence>
           </div>
 
-          {/* Desktop Countdown (Small, no frame, below text) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 1, delay: 0.9 }}
-            className="hidden md:flex justify-start w-full max-w-xl mx-0 mb-6"
-          >
-            <div className="flex gap-6">
-              {Object.entries(timeLeft).map(([unit, value]) => (
-                <div key={unit} className="flex flex-col items-center px-1">
-                  <span className="font-cormorant text-2xl text-luxury-gold">{value.toString().padStart(2, '0')}</span>
-                  <span className="font-sans text-[9px] uppercase tracking-widest text-pearl-white/70 mt-1">{unit}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

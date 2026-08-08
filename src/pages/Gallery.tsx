@@ -6,17 +6,26 @@ import { subscribeToGallery, GalleryImage } from '../services/galleryService';
 
 const defaultImages = [
   "https://i.pinimg.com/originals/0b/5f/13/0b5f13ee309e4aa2e9b3d7d864a235d0.jpg",
-  "https://i.pinimg.com/originals/21/eb/ca/21ebcaaad4d28a822e9e149c166428d1.jpg",
   "https://i.pinimg.com/originals/2b/00/ab/2b00abecb4527f39e493600010d73c21.jpg",
-  "https://i.pinimg.com/originals/3a/c4/23/3ac4237586ca6f6287e076e4a67a95f9.jpg",
   "https://i.pinimg.com/originals/3c/91/1f/3c911fb1d8d2c01addc7b05267f3eb83.jpg",
   "https://i.pinimg.com/originals/79/68/6c/79686c6940d1dbaab2cec8f8edeeef8e.jpg",
   "https://i.pinimg.com/originals/84/f1/b0/84f1b0c535be0b1ca9746f8f37312e5f.jpg",
-  "https://i.pinimg.com/originals/b0/56/35/b05635f79a1ed01406ea1d0c7dea1741.jpg",
   "https://i.pinimg.com/originals/cb/46/01/cb4601f1a7763f83069120039c5199aa.jpg",
   "https://i.pinimg.com/originals/db/d8/d2/dbd8d22ef61d0b9d4786ed5708640568.jpg",
   "https://i.pinimg.com/originals/e6/6e/70/e66e7002bd1476084ddb834e1f3d1783.jpg",
-  "https://i.pinimg.com/originals/e8/e0/4a/e8e04ad75b29e2cf0918a4100eedce1d.jpg"
+  "https://i.pinimg.com/originals/1a/40/7c/1a407c0f1d2620d795f2b7cc63cd2bcf.jpg",
+  "https://i.pinimg.com/originals/1a/69/d7/1a69d7ef43eea3246d7ceec36ca22092.jpg",
+  "https://i.pinimg.com/originals/3e/a9/5d/3ea95d5e2118f1278903363dca23164e.jpg",
+  "https://i.pinimg.com/originals/4e/25/ff/4e25ffd989506b15348ada734e131a5e.jpg",
+  "https://i.pinimg.com/originals/85/ec/46/85ec4661e333a79fb12656b8ec665b18.jpg",
+  "https://i.pinimg.com/originals/a1/ec/50/a1ec50b766107d4b459ba9842ba4d1fa.jpg",
+  "https://i.pinimg.com/originals/b1/43/e6/b143e6af22d5149f789a67e07f5eb619.jpg",
+  "https://i.pinimg.com/originals/b7/7e/99/b77e99998c6513dd90fac6101ac1aa4d.jpg",
+  "https://i.pinimg.com/originals/bb/be/1a/bbbe1a21f482a9fb9ec497c7e2e6a729.jpg",
+  "https://i.pinimg.com/originals/be/11/da/be11da05010923f2c6596054948ec3a0.jpg",
+  "https://i.pinimg.com/originals/c7/71/10/c77110b8f95890683db4799a7d83cc2f.jpg",
+  "https://i.pinimg.com/originals/eb/1f/ba/eb1fbab12a5d7529c56cb724533b5453.jpg",
+  "https://i.pinimg.com/originals/54/f9/3c/54f93c7d1d0b445bcb1ae2e6414d9108.jpg"
 ];
 
 export default function Gallery() {

@@ -5,8 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 const navLinks = [
-  { title: 'Wishes Wall', path: '/wishes' },
+  { title: 'Home', path: '/' },
+  { title: 'Biography', path: '/biography' },
+  { title: 'Gallery', path: '/gallery' },
   { title: 'Message of Love', path: '/guestbook' },
+  { title: 'Wishes Wall', path: '/wishes' },
 ];
 
 const calculateTimeLeft = (targetDate: string = "2026-08-09T00:00:00") => {

@@ -22,7 +22,7 @@ export default function Footer() {
         <div className="w-24 h-[1px] bg-luxury-gold/50 mx-auto mb-8"></div>
         
         <p className="text-xs text-pearl-white/40">
-          &copy; {new Date().getFullYear()} Golden Jubilee Celebration. All rights reserved.
+          &copy; {new Date().getFullYear()} Tayo is 50. All rights reserved. | Developed by Worxflux Tech Solution
         </p>
       </div>
     </footer>

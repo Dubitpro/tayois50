@@ -76,8 +76,8 @@ export default function MusicPlayer() {
               playPromise.then(() => {
                 setIsPlaying(true);
                 setAutoplayFailed(false);
-              }).catch(err => {
-                console.error("Initial autoplay prevented by browser:", err);
+              }).catch(() => {
+                // Autoplay blocked by browser. This is expected.
                 setIsPlaying(false);
                 setAutoplayFailed(true);
               });
@@ -172,7 +172,7 @@ export default function MusicPlayer() {
 
   if (loading) {
     return (
-      <div className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 bg-elegant-black/95 rounded-full shadow-2xl border border-luxury-gold/50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center justify-center w-12 h-12 bg-elegant-black/95 rounded-full shadow-2xl border border-luxury-gold/50">
         <Loader2 className="w-5 h-5 text-luxury-gold animate-spin" />
       </div>
     );
@@ -180,7 +180,7 @@ export default function MusicPlayer() {
 
   if (tracks.length === 0) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
         <div className="bg-elegant-black/95 backdrop-blur-xl border border-luxury-gold/50 rounded-full shadow-2xl flex items-center px-4 py-2">
            <Music className="text-luxury-gold/50 w-5 h-5 mr-3" />
            <p className="text-white/60 text-xs uppercase tracking-wider font-sans">No music available</p>
@@ -202,7 +202,7 @@ export default function MusicPlayer() {
         onError={handleError}
       />
       
-      <div className="fixed bottom-6 right-6 z-50 flex items-end">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-end">
         {/* Playlist Drawer */}
         <AnimatePresence>
           {showPlaylist && (
@@ -298,44 +298,44 @@ export default function MusicPlayer() {
                 initial={{ width: 0, opacity: 0 }}
                 animate={{ width: "auto", opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
-                className="overflow-hidden flex items-center pl-4 pr-2"
+                className="overflow-hidden flex items-center pl-2 sm:pl-4 pr-1 sm:pr-2"
               >
-                <div className="mr-6 w-32">
-                  <p className="text-white text-sm font-medium truncate">{currentTrack.title}</p>
-                  <p className="text-luxury-gold text-xs truncate">{currentTrack.artist}</p>
+                <div className="mr-2 sm:mr-6 w-24 sm:w-32">
+                  <p className="text-white text-xs sm:text-sm font-medium truncate">{currentTrack.title}</p>
+                  <p className="text-luxury-gold text-[10px] sm:text-xs truncate">{currentTrack.artist}</p>
                 </div>
 
-                <div className="flex items-center gap-4 text-white">
-                  <button onClick={() => setIsShuffle(!isShuffle)} className={cn("transition-colors", isShuffle ? "text-luxury-gold" : "text-white/50 hover:text-white")}>
+                <div className="flex items-center gap-2 sm:gap-4 text-white">
+                  <button onClick={() => setIsShuffle(!isShuffle)} className={cn("hidden sm:block transition-colors", isShuffle ? "text-luxury-gold" : "text-white/50 hover:text-white")}>
                     <Shuffle size={16} />
                   </button>
                   <button onClick={prevTrack} className="text-white/80 hover:text-white transition-colors">
-                    <SkipBack size={20} />
+                    <SkipBack size={18} className="sm:w-5 sm:h-5" />
                   </button>
                   <button 
                     onClick={togglePlay} 
-                    className="w-10 h-10 rounded-full bg-luxury-gold text-elegant-black flex items-center justify-center hover:scale-105 transition-transform"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-luxury-gold text-elegant-black flex items-center justify-center hover:scale-105 transition-transform shrink-0"
                   >
-                    {isPlaying ? <Pause size={20} className="fill-current" /> : <Play size={20} className="fill-current ml-1" />}
+                    {isPlaying ? <Pause size={16} className="fill-current sm:w-5 sm:h-5" /> : <Play size={16} className="fill-current ml-1 sm:w-5 sm:h-5" />}
                   </button>
                   <button onClick={nextTrack} className="text-white/80 hover:text-white transition-colors">
-                    <SkipForward size={20} />
+                    <SkipForward size={18} className="sm:w-5 sm:h-5" />
                   </button>
-                  <button onClick={() => setIsRepeat(!isRepeat)} className={cn("transition-colors", isRepeat ? "text-luxury-gold" : "text-white/50 hover:text-white")}>
+                  <button onClick={() => setIsRepeat(!isRepeat)} className={cn("hidden sm:block transition-colors", isRepeat ? "text-luxury-gold" : "text-white/50 hover:text-white")}>
                     <Repeat size={16} />
                   </button>
                 </div>
 
-                <div className="h-8 w-[1px] bg-white/20 mx-4" />
+                <div className="h-6 sm:h-8 w-[1px] bg-white/20 mx-2 sm:mx-4" />
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <button onClick={() => setShowPlaylist(!showPlaylist)} className={cn("transition-colors", showPlaylist ? "text-luxury-gold" : "text-white/50 hover:text-white")}>
                     <ListMusic size={18} />
                   </button>
-                  <button onClick={() => setIsMuted(!isMuted)} className="text-white/80 hover:text-white">
+                  <button onClick={() => setIsMuted(!isMuted)} className="hidden sm:block text-white/80 hover:text-white">
                     {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
                   </button>
-                  <div className="w-16 h-1 bg-white/20 rounded-full cursor-pointer relative group" onClick={(e) => {
+                  <div className="hidden sm:block w-16 h-1 bg-white/20 rounded-full cursor-pointer relative group" onClick={(e) => {
                     const bounds = e.currentTarget.getBoundingClientRect();
                     setVolume(Math.max(0, Math.min(1, (e.clientX - bounds.left) / bounds.width)));
                     setIsMuted(false);
